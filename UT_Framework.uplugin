@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "UT_Framework",
+	"Description": "",
+	"Category": "Umbra Tools",
+	"CreatedBy": "Axel Clerget - Maxwell",
+	"CreatedByURL": "www.axelcerget.com",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "UT_Framework",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
