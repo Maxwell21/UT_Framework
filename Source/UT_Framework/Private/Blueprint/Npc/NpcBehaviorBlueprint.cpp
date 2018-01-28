@@ -3,16 +3,10 @@
 /* Maxwell - Axel Clerget   											*/
 /************************************************************************/
 
-#pragma once
+#include "NpcBehaviorBlueprint.h"
+#include "NpcBehavior.h"
 
-#include "CoreMinimal.h"
-#include "ModuleManager.h"
-
-class FUT_FrameworkModule : public IModuleInterface
+UNpcBehavior* UNpcBehaviorBlueprint::GetNpcBehavior()
 {
-public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-};
+	return this->GeneratedClass->GetDefaultObject<UNpcBehavior>();
+}

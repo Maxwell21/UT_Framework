@@ -3,16 +3,15 @@
 /* Maxwell - Axel Clerget   											*/
 /************************************************************************/
 
-#pragma once
+#include "NpcBehaviorTask_RandomBranch.h"
+#include "NpcBehavior.h"
 
-#include "CoreMinimal.h"
-#include "ModuleManager.h"
-
-class FUT_FrameworkModule : public IModuleInterface
+void UNpcBehaviorTask_RandomBranch::Execute()
 {
-public:
+	/*
+	#if WITH_EDITOR
+		UE_LOG(LogTemp, Warning, TEXT("Execute wait task << %f >>"));
+	#endif
+	*/
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-};
+}

@@ -1,4 +1,7 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
+/************************************************************************/
+/* UMBRA TOOLS                                                          */
+/* Maxwell - Axel Clerget   											*/
+/************************************************************************/
 
 #include "UT_Framework.h"
 
