@@ -3,16 +3,15 @@
 /* Maxwell - Axel Clerget   											*/
 /************************************************************************/
 
-#pragma once
+#include "NpcBehaviorTask_Entry.h"
+#include "Engine/Engine.h"
 
-#include "CoreMinimal.h"
-#include "ModuleManager.h"
-
-class FUT_FrameworkModule : public IModuleInterface
+void UNpcBehaviorTask_Entry::Execute()
 {
-public:
+	#if WITH_EDITOR
+		UE_LOG(LogTemp, Warning, TEXT("START NPC BEHAVIOR"));
+	#endif
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-};
+	// automatically execute the next task 
+	this->ExecuteNextTask();
+}
