@@ -51,6 +51,7 @@ public class UT_FrameworkEditor : ModuleRules
                 "AssetTools",
                 "Projects",
                 "LevelEditor",
+                "KismetCompiler",
                 "UT_Framework",
 				// ... add private dependencies that you statically link with here ...	
 			}
