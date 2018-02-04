@@ -6,13 +6,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModuleManager.h"
+#include "EdGraphUtilities.h"
+#include "SGraphNode.h"
 
-class FUT_FrameworkModule : public IModuleInterface
+class UT_FRAMEWORKEDITOR_API FNpcBehaviorGraphFactory : public FGraphPanelNodeFactory
 {
-public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+	virtual TSharedPtr<class SGraphNode> CreateNode(class UEdGraphNode* InNode) const override;
 };
+

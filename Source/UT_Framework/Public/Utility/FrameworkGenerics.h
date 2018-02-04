@@ -6,13 +6,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ModuleManager.h"
+#include "UObject/NoExportTypes.h"
+#include "FrameworkGenerics.generated.h"
 
-class FUT_FrameworkModule : public IModuleInterface
+USTRUCT()
+struct UT_FRAMEWORK_API FGenericNodeData
 {
+	GENERATED_BODY()
+
 public:
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+	UPROPERTY()
+	int32 NodePosX;
+
+	UPROPERTY()
+	int32 NodePosY;
+
+	FGenericNodeData()
+		: NodePosX(0)
+		, NodePosY(0)
+	{
+	}
 };

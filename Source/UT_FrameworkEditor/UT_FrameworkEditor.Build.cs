@@ -2,15 +2,15 @@
 
 using UnrealBuildTool;
 
-public class UT_Framework : ModuleRules
+public class UT_FrameworkEditor : ModuleRules
 {
-	public UT_Framework(ReadOnlyTargetRules Target) : base(Target)
+	public UT_FrameworkEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"UT_Framework/Public"
+				"UT_FrameworkEditor/Public"
 				// ... add public include paths required here ...
 			}
 			);
@@ -18,7 +18,7 @@ public class UT_Framework : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"UT_Framework/Private",
+				"UT_FrameworkEditor/Private",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -41,9 +41,18 @@ public class UT_Framework : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "UMG",
+                "EditorStyle",
+                "KismetWidgets",
+                "UnrealEd",
+                "Kismet",
+                "GraphEditor",
+                "BlueprintGraph",
                 "AIModule",
-                "GameplayTasks",
+                "AssetTools",
+                "Projects",
+                "LevelEditor",
+                "KismetCompiler",
+                "UT_Framework",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
