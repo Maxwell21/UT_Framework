@@ -14,10 +14,12 @@
 #include "BlueprintEditorUtils.h"
 #include "StateMachineGraph.h"
 #include "StateMachineGraphNode.h"
+#include "StateMachineGraphNode_Entry.h"
 #include "StateMachineGraphNode_Transition.h"
 #include "StateMachineState_Default.h"
 #include "StateMachineState_Entry.h"
 #include "StateMachineTransition_Default.h"
+#include "StateMachineBlueprint.h"
 #include "EditorUtilities.h"
 
 class UT_FRAMEWORKEDITOR_API FStateMachineUtilities : public FEditorUtilities
@@ -130,37 +132,48 @@ public:
 			return;
 
 		UStateMachineBlueprint* Blueprint = Graph->StateMachineBlueprint;
-		UStateMachineState_Default* State = StateNode->State;
+		UStateMachineState_Default* SmState = StateNode->State;
+		FState& State = SmState->RuntimeData;
 
 		// Generate state name
-		State->StateName = "NewState_" + FString::FromInt(State->GetUniqueID());
+		State.Name = "NewState_" + FString::FromInt(SmState->GetUniqueID());
 		
 		// Create graph
-		State->StateGraph = FBlueprintEditorUtils::CreateNewGraph(Blueprint, *State->StateName, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
-		State->StateGraph->bAllowDeletion = false;
-		State->StateGraph->bAllowRenaming = false;
+		SmState->StateGraph = FBlueprintEditorUtils::CreateNewGraph(Blueprint, *State.Name, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
+		SmState->StateGraph->bAllowDeletion = false;
+		SmState->StateGraph->bAllowRenaming = false;
 		
 		// Add to the blueprint graphs
-		FBlueprintEditorUtils::AddUbergraphPage(Blueprint, State->StateGraph);
+		FBlueprintEditorUtils::AddUbergraphPage(Blueprint, SmState->StateGraph);
+		
+		State.BeginFunctionName = State.Name + SUFFIX_BEGIN_NAME;
+		State.UpdateFunctionName = State.Name + SUFFIX_UPDATE_NAME;
+		State.FinishFunctionName = State.Name + SUFFIX_FINISH_NAME;
 
 		// Generate new events
-		UFunction* BeginFunction = FindField<UFunction>(State->GetClass(), "BeginState");
-		UK2Node_CustomEvent* BeginEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 0), State->StateGraph, State->StateName + SUFFIX_BEGIN_NAME, BeginFunction, false);
+		UFunction* BeginFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "BeginState");
+		UK2Node_CustomEvent* BeginEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 0), SmState->StateGraph, State.BeginFunctionName, BeginFunction, false);
 		BeginEvent->bCanRenameNode = false;
 
-		UFunction* UpdateFunction = FindField<UFunction>(State->GetClass(), "UpdateState");
-		UK2Node_CustomEvent* UpdateEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 100.f), State->StateGraph, State->StateName + SUFFIX_UPDATE_NAME, UpdateFunction, false);
+		UFunction* UpdateFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "UpdateState");
+		UK2Node_CustomEvent* UpdateEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 100.f), SmState->StateGraph, State.UpdateFunctionName, UpdateFunction, false);
+	
+		TSharedPtr<FUserPinInfo> PinDefinition = MakeShareable(new FUserPinInfo);
+		FEdGraphPinType PinType;
+		const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
+		PinType.bIsReference = false;
+		PinType.PinCategory = K2Schema->PC_Float;
+		PinDefinition->PinName = "DeltaTime";
+		PinDefinition->PinType = PinType;
+		UEdGraphPin* NewPin = UpdateEvent->CreatePinFromUserDefinition(PinDefinition);
+		UpdateEvent->ReconstructNode();
 		UpdateEvent->bCanRenameNode = false;
 
-		UFunction* FinishFunction = FindField<UFunction>(State->GetClass(), "FinishState");
-		UK2Node_CustomEvent* FinishEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 250.f), State->StateGraph, State->StateName + SUFFIX_FINISH_NAME, FinishFunction, false);
+		UFunction* FinishFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "FinishState");
+		UK2Node_CustomEvent* FinishEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 250.f), SmState->StateGraph, State.FinishFunctionName, FinishFunction, false);
 		FinishEvent->bCanRenameNode = false;
 
-		State->BeginStateFunctionName = State->StateName + SUFFIX_BEGIN_NAME;
-		State->UpdateStateFunctionName = State->StateName + SUFFIX_UPDATE_NAME;
-		State->FinishStateFunctionName = State->StateName + SUFFIX_FINISH_NAME;
-
-		
+		Blueprint->GetStateMachine()->AddOrUpdateState(State);
 	};
 
 	/**
@@ -180,14 +193,17 @@ public:
 		UStateMachineGraphNode* InputState = CastChecked<UStateMachineGraphNode>(TransNode->GetInputPin()->LinkedTo[0]->GetOwningNode());
 		UStateMachineGraphNode* OutputState = CastChecked<UStateMachineGraphNode>(TransNode->GetOutputPin()->LinkedTo[0]->GetOwningNode());
 		UStateMachineTransition_Default* Transition = TransNode->Transition;
+		FTransition& RuntimeData = Transition->RuntimeData;
 
 		if (InputState && OutputState)
 		{
 			// Generate transition name
-			Transition->TransitionName = "Transition_" + InputState->State->StateName + "To" + OutputState->State->StateName;
+			RuntimeData.Name = "Transition_" + InputState->State->RuntimeData.Name + "To" + OutputState->State->RuntimeData.Name;
+			RuntimeData.FromState = InputState->State->RuntimeData.Name;
+			RuntimeData.ToState = OutputState->State->RuntimeData.Name;
 
 			// Create function graph
-			Transition->TransitionGraph = FBlueprintEditorUtils::CreateNewGraph(Blueprint, *Transition->TransitionName, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
+			Transition->TransitionGraph = FBlueprintEditorUtils::CreateNewGraph(Blueprint, *RuntimeData.Name, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
 			Transition->TransitionGraph->bAllowDeletion = false;
 			Transition->TransitionGraph->bAllowRenaming = false;
 			FBlueprintEditorUtils::AddFunctionGraph<UClass>(Blueprint, Transition->TransitionGraph, true, nullptr);
@@ -219,6 +235,8 @@ public:
 					}
 				}
 			}
+
+			Blueprint->GetStateMachine()->AddOrUpdateTransition(RuntimeData);
 		}
 	};
 
@@ -233,9 +251,10 @@ public:
 	{
 		if (State && State->StateGraph)
 		{
-			State->StateName = NewName;
+			FState& RuntimeState = State->RuntimeData;
+			RuntimeState.Name = NewName;
 
-			FBlueprintEditorUtils::RenameGraph(State->StateGraph, State->StateName);
+			FBlueprintEditorUtils::RenameGraph(State->StateGraph, RuntimeState.Name);
 			
 			for (UEdGraphNode* Node : State->StateGraph->Nodes)
 			{
@@ -248,9 +267,11 @@ public:
 					Node->OnRenameNode(NewName + SUFFIX_FINISH_NAME);
 			}
 
-			State->BeginStateFunctionName  = State->StateName + SUFFIX_BEGIN_NAME;
-			State->UpdateStateFunctionName = State->StateName + SUFFIX_UPDATE_NAME;
-			State->FinishStateFunctionName = State->StateName + SUFFIX_FINISH_NAME;
+			RuntimeState.BeginFunctionName  = RuntimeState.Name + SUFFIX_BEGIN_NAME;
+			RuntimeState.UpdateFunctionName = RuntimeState.Name + SUFFIX_UPDATE_NAME;
+			RuntimeState.FinishFunctionName = RuntimeState.Name + SUFFIX_FINISH_NAME;
+
+			State->EditedStateMachineBlueprint->GetStateMachine()->AddOrUpdateState(RuntimeState, OldName);
 		}
 	};
 
@@ -264,6 +285,7 @@ public:
 		if (Transition && Transition->TransitionGraph)
 		{
 			UStateMachineGraphNode_Transition* TransNode = CastChecked<UStateMachineGraphNode_Transition>(Transition->GraphNode);
+			FTransition& RuntimeData = Transition->RuntimeData;
 
 			// check if the transition node is linked to through input pin and output pin
 			if ((!TransNode->GetInputPin() || TransNode->GetInputPin()->LinkedTo.Num() == 0)
@@ -273,12 +295,16 @@ public:
 			UStateMachineGraphNode* InputState = CastChecked<UStateMachineGraphNode>(TransNode->GetInputPin()->LinkedTo[0]->GetOwningNode());
 			UStateMachineGraphNode* OutputState = CastChecked<UStateMachineGraphNode>(TransNode->GetOutputPin()->LinkedTo[0]->GetOwningNode());
 
+			FString OldName = Transition->TransitionGraph->GetName();
+
 			// Generate new transition name
-			FString TransitionName = "Transition_" + InputState->State->StateName + "To" + OutputState->State->StateName;
+			RuntimeData.Name = "Transition_" + InputState->State->RuntimeData.Name + "To" + OutputState->State->RuntimeData.Name;
+			RuntimeData.FromState = InputState->State->RuntimeData.Name;
+			RuntimeData.ToState = OutputState->State->RuntimeData.Name;
 
 			// Rename
-			Transition->TransitionName = TransitionName;
-			FBlueprintEditorUtils::RenameGraph(Transition->TransitionGraph, Transition->TransitionName);
+			FBlueprintEditorUtils::RenameGraph(Transition->TransitionGraph, RuntimeData.Name);
+			Transition->EditedStateMachineBlueprint->GetStateMachine()->AddOrUpdateTransition(RuntimeData, OldName);
 		}
 	};
 

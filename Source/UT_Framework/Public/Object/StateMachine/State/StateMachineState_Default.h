@@ -8,9 +8,9 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "FrameworkGenerics.h"
+#include "StateMachine.h"
 #include "StateMachineState_Default.generated.h"
 
-class UStateMachine;
 class UStateMachineTransition_Default;
 
 /**
@@ -29,26 +29,11 @@ public:
 
 	/** Main name of the state (using also in the graph editor as node title) */
 	UPROPERTY()
-	FString StateName;
-
-	/** Function name related to the "Custom Event" inside the state graph */
-	UPROPERTY()
-	FString BeginStateFunctionName;
-
-	/** Function name related to the "Custom Event" inside the state graph */
-	UPROPERTY()
-	FString UpdateStateFunctionName;
-
-	/** Function name related to the "Custom Event" inside the state graph */
-	UPROPERTY()
-	FString FinishStateFunctionName;
+	FState RuntimeData;
 
 	/** All transitions to others states */
 	UPROPERTY()
 	TArray<UStateMachineTransition_Default*> Transitions;
-
-	/** Current state machine owner */
-	UStateMachine* OwnerStateMachine;
 
 #if WITH_EDITORONLY_DATA
 
@@ -71,16 +56,5 @@ public:
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
-
-	void Init(UStateMachine* Owner);
-
-	UFUNCTION()
-	void BeginState();
-
-	UFUNCTION()
-	void UpdateState(float DeltaTime);
-
-	UFUNCTION()
-	void FinishState();
 
 };

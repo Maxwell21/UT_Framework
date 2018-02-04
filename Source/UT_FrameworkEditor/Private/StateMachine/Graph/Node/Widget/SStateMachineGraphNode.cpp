@@ -212,7 +212,7 @@ void SStateMachineGraphNode::OnNameTextCommited(const FText& InText, ETextCommit
 {
 	if (UStateMachineGraphNode* StateMachineGraphNode = CastChecked<UStateMachineGraphNode>(GraphNode))
 	{
-		FStateMachineUtilities::RenameBoundingGraph(StateMachineGraphNode->State, StateMachineGraphNode->State->StateName, InText.ToString());
+		FStateMachineUtilities::RenameBoundingGraph(StateMachineGraphNode->State, StateMachineGraphNode->State->RuntimeData.Name, InText.ToString());
 
 		TArray<UStateMachineGraphNode_Transition*> Transitions;
 		StateMachineGraphNode->GetTransitionList(Transitions);

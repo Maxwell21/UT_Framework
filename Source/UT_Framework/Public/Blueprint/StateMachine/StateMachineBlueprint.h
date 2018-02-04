@@ -25,9 +25,6 @@ public:
 	/* PROPERTIES                                                           */
 	/************************************************************************/
 
-	UPROPERTY()
-	UStateMachine* StateMachine;
-
 #if WITH_EDITORONLY_DATA
 
 	/** EdGraph based representation of the StateMachine */
@@ -42,10 +39,6 @@ public:
 	UPROPERTY()
 	TArray<class UEdGraphNode*> Nodes;
 
-	/** All graphs linked to each states */
-	UPROPERTY()
-	TArray<class UEdGraph*> StatesGraph;
-
 #endif	
 
 	/************************************************************************/
@@ -53,4 +46,9 @@ public:
 	/************************************************************************/
 
 	UStateMachine* GetStateMachine();
+
+#if WITH_EDITOR
+	virtual UClass* GetBlueprintClass() const override;
+#endif
+
 };

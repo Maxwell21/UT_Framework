@@ -5,6 +5,7 @@
 
 #include "StateMachineFactory.h"
 #include "StateMachineBlueprint.h"
+#include "StateMachineBlueprintGeneratedClass.h"
 #include "StateMachine.h"
 #include "Engine/Blueprint.h"
 #include "KismetEditorUtilities.h"
@@ -20,7 +21,7 @@ UStateMachineFactory::UStateMachineFactory(const FObjectInitializer& ObjectIniti
 
 UObject* UStateMachineFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn, FName CallingContext)
 {
-	UStateMachineBlueprint* StateMachineBlueprint = CastChecked<UStateMachineBlueprint>(FKismetEditorUtilities::CreateBlueprint(ParentClass, InParent, Name, BPTYPE_Normal, UStateMachineBlueprint::StaticClass(), UBlueprintGeneratedClass::StaticClass(), CallingContext));
+	UStateMachineBlueprint* StateMachineBlueprint = CastChecked<UStateMachineBlueprint>(FKismetEditorUtilities::CreateBlueprint(ParentClass, InParent, Name, BPTYPE_Normal, UStateMachineBlueprint::StaticClass(), UStateMachineBlueprintGeneratedClass::StaticClass(), CallingContext));
 
 	return StateMachineBlueprint;
 }

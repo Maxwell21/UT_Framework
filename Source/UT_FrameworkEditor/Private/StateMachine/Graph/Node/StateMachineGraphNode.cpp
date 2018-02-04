@@ -88,9 +88,13 @@ void UStateMachineGraphNode::DestroyNode()
 		{
 			TransNode->DestroyNode();
 		}
+	}
 
+	if (this->State)
+	{
 		// Destroy object and dereference it to the states array
-		StateMachineGraph->StateMachineBlueprint->GetStateMachine()->States.Remove(this->State);
+		StateMachineGraph->StateMachineBlueprint->GetStateMachine()->GetGeneratedClass()->States.Remove(this->State);
+		StateMachineGraph->StateMachineBlueprint->GetStateMachine()->RemoveStateByName(this->State->RuntimeData.Name);
 		this->State->MarkPendingKill();
 	}
 
@@ -130,7 +134,7 @@ FText UStateMachineGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
 
 FString UStateMachineGraphNode::GetStateName() const
 {
-	return (this->State) ? this->State->StateName : "";
+	return (this->State) ? this->State->RuntimeData.Name : "";
 }
 
 void UStateMachineGraphNode::ReallocateDefaultPins()

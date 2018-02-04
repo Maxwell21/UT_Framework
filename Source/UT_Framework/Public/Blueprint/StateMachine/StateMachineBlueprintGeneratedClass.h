@@ -6,54 +6,46 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "FrameworkGenerics.h"
-#include "StateMachine.h"
-#include "StateMachineTransition_Default.generated.h"
+#include "Engine/Blueprint.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "StateMachineBlueprintGeneratedClass.generated.h"
+
+class UStateMachineState_Entry;
+class UStateMachineState_Default;
 
 /**
  * 
  */
 UCLASS()
-class UT_FRAMEWORK_API UStateMachineTransition_Default : public UObject
+class UT_FRAMEWORK_API UStateMachineBlueprintGeneratedClass : public UBlueprintGeneratedClass
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 public:
-	
+
 	/************************************************************************/
 	/* PROPERTIES                                                           */
 	/************************************************************************/
 
 	UPROPERTY()
-	FTransition RuntimeData;
+	UStateMachineState_Entry* EntryState;
 
-#if WITH_EDITORONLY_DATA
-
-	UPROPERTY()
-	UStateMachineState_Default* FromState;
+	UStateMachineState_Default* CurrentState = nullptr;
 
 	UPROPERTY()
-	UStateMachineState_Default* ToState;
-
-	/** Current GraphNode owner */
-	class UEdGraphNode* GraphNode = nullptr;
-
-	/** EdGraph based representation of the Transition */
-	UPROPERTY()
-	class UEdGraph* TransitionGraph = nullptr;
-
-	/** Node data (position) */
-	UPROPERTY()
-	FGenericNodeData NodeData;
-
-	/* Current blueprint edited on the custom editor */
-	class UStateMachineBlueprint* EditedStateMachineBlueprint;
-
-#endif
+	TArray<UStateMachineState_Default*> States;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
+	// UObject interface
+	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override;
+	virtual void Serialize(FArchive& Ar) override;
+	virtual UObject* CreateDefaultObject() override;
+	virtual void PostLoad() override;
+	virtual bool NeedsLoadForServer() const override;
+	// End UObject interface
+
+	virtual void PurgeClass(bool bRecompilingOnLoad) override;
 };

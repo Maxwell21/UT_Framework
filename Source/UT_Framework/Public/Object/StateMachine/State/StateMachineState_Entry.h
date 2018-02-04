@@ -10,8 +10,6 @@
 #include "StateMachineState_Default.h"
 #include "StateMachineState_Entry.generated.h"
 
-class UStateMachineState_Default;
-
 /**
  * 
  */
@@ -27,7 +25,7 @@ public:
 	/************************************************************************/
 
 	UPROPERTY()
-	UStateMachineState_Default* State;
+	UStateMachineState_Default* EntryState;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */

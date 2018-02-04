@@ -85,6 +85,7 @@ void UStateMachineGraphNode_Transition::DestroyNode()
 	if (GraphToRemove && StateMachineGraph)
 		FBlueprintEditorUtils::RemoveGraph(StateMachineGraph->StateMachineBlueprint, GraphToRemove, EGraphRemoveFlags::Recompile);
 
+	this->Transition->EditedStateMachineBlueprint->GetStateMachine()->RemoveTransitionByName(this->Transition->RuntimeData.Name);
 	this->Transition->MarkPendingKill();
 
 	UEdGraphNode::DestroyNode();

@@ -98,7 +98,7 @@ void UStateMachineGraph::RegisterNode(UStateMachineState_Default* State, UStateM
 
 	//Register node to the nodes array
 	this->StateMachineBlueprint->Nodes.Add(NewNode);
-	this->StateMachineBlueprint->GetStateMachine()->States.Add(State);
+	this->StateMachineBlueprint->GetStateMachine()->GetGeneratedClass()->States.Add(State);
 
 	State->GraphNode = NewNode;
 	NewNode->State = State;
@@ -112,11 +112,11 @@ void UStateMachineGraph::RegisterNode(UStateMachineState_Default* State, UStateM
 		// apply current blueprint edited
 		this->SetCurrentStateMachineBlueprintToNode(FromNode);
 
-		if (FromNode->GetRootNode())
-			this->SetEntryState(State);
-
 		if (NewNode->GetRootNode() == false)
 			NewNode->CreateBoundGraph();
+
+		if (FromNode->GetRootNode())
+			this->SetEntryState(State);
 	}
 
 	this->SetCurrentStateMachineBlueprintToNode(NewNode);
@@ -135,7 +135,7 @@ void UStateMachineGraph::RegisterEntryNode(UStateMachineState_Entry* Entry, USta
 	//Register node to the nodes array
 	this->StateMachineBlueprint->Nodes.Add(NewNode);
 	this->StateMachineBlueprint->EntryNode = NewNode;
-	this->StateMachineBlueprint->GetStateMachine()->EntryState = Entry;
+	this->StateMachineBlueprint->GetStateMachine()->GetGeneratedClass()->EntryState = Entry;
 
 	Entry->GraphNode = NewNode;
 	NewNode->ReallocateDefaultPins();
@@ -156,6 +156,7 @@ void UStateMachineGraph::RegisterTransitionNode(UStateMachineTransition_Default*
 	Transition->GraphNode = NewNode;
 	NewNode->Transition = Transition;
 
+	this->SetCurrentStateMachineBlueprintToNode(NewNode);
 	NotifyGraphChanged();
 }
 
@@ -207,7 +208,7 @@ void UStateMachineGraph::InitDefaultNode()
 
 UObject* UStateMachineGraph::PrepareOuter()
 {
-	return this->StateMachineBlueprint->GetStateMachine();
+	return this->StateMachineBlueprint;
 }
 
 void UStateMachineGraph::SetEntryState(UStateMachineState_Default* State)
@@ -216,7 +217,8 @@ void UStateMachineGraph::SetEntryState(UStateMachineState_Default* State)
 	{
 		this->EntryNode->State = State;
 		UStateMachine* StateMachine = this->StateMachineBlueprint->GetStateMachine();
-		StateMachine->EntryState->State = State;
+		StateMachine->GetGeneratedClass()->EntryState->EntryState = State;
+		StateMachine->SetRootState(State->RuntimeData.Name);
 	}
 }
 
@@ -241,6 +243,8 @@ void UStateMachineGraph::SetCurrentStateMachineBlueprintToNode(UStateMachineGrap
 {
 	if (Node && Node->State)
 		Node->State->EditedStateMachineBlueprint = this->StateMachineBlueprint;
+	else if (UStateMachineGraphNode_Transition* TransNode = Cast<UStateMachineGraphNode_Transition>(Node))
+		TransNode->Transition->EditedStateMachineBlueprint = this->StateMachineBlueprint;
 }
 
 UStateMachineGraphNode* UStateMachineGraph::FindNodeByState(UStateMachineState_Default* State)
