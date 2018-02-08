@@ -8,11 +8,15 @@
 #include "CoreMinimal.h"
 #include "ModuleManager.h"
 #include "Toolkits/AssetEditorToolkit.h"
+#include "KismetCompilerModule.h"
 
 class UNpcBehaviorBlueprint;
+class UStateMachineBlueprint;
 class FNpcBehaviorGraphFactory;
+class FStateMachineGraphFactory;
+struct FStateMachineGraphPinConnectionFactory;
 
-class FUT_FrameworkEditorModule : public IModuleInterface, public IHasMenuExtensibility, public IHasToolBarExtensibility
+class FUT_FrameworkEditorModule : public IModuleInterface, public IHasMenuExtensibility, public IHasToolBarExtensibility, public IBlueprintCompiler
 {
 
 protected:
@@ -24,6 +28,8 @@ protected:
 	TSharedPtr<FExtensibilityManager> MenuExtensibilityManager;
 	TSharedPtr<FExtensibilityManager> ToolBarExtensibilityManager;
 	TSharedPtr<FNpcBehaviorGraphFactory> NpcBehaviorGraphFactory;
+	TSharedPtr<FStateMachineGraphFactory> StateMachineGraphFactory;
+	TSharedPtr<FStateMachineGraphPinConnectionFactory> StateMachineGraphPinConnectionFactory;
 
 public:
 
@@ -40,13 +46,17 @@ public:
 	virtual TSharedPtr<FExtensibilityManager> GetToolBarExtensibilityManager() override { return ToolBarExtensibilityManager; };
 
 	TSharedRef<FAssetEditorToolkit> CreateNpcEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UNpcBehaviorBlueprint* Blueprint);
+	TSharedRef<FAssetEditorToolkit> CreateStateMachineEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UStateMachineBlueprint* Blueprint);
 
 	void RegisterAssetActions();
 	void RegisterNpcBehaviorTasks();
+
+	/** IBlueprintCompiler implementation */
+	virtual bool CanCompile(const UBlueprint* Blueprint) override;
+	virtual void Compile(UBlueprint* Blueprint, const FKismetCompilerOptions& CompileOptions, FCompilerResultsLog& Results, TArray<UObject *>* ObjLoaded) override;
 
 	static inline FUT_FrameworkEditorModule& Get()
 	{
 		return FModuleManager::LoadModuleChecked<FUT_FrameworkEditorModule>("UT_FrameworkEditor");
 	};
-
 };

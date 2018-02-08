@@ -54,14 +54,20 @@ void FFrameworkStyle::Initialize()
 
 	StyleSet = MakeShareable(new FSlateStyleSet(GetStyleSetName()));
 	StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin(TEXT("UT_Framework"))->GetContentDir());
+	
+	// Icons 
 	StyleSet->Set("ClassIcon.NpcBehavior", new PLUGIN_BRUSH(TEXT("Icons/NpcBehavior-16"), Icon16x16));
 	StyleSet->Set("ClassThumbnail.NpcBehavior", new PLUGIN_BRUSH(TEXT("Icons/NpcBehavior-40"), Icon40x40));
+	StyleSet->Set("ClassIcon.StateMachineBlueprint", new PLUGIN_BRUSH(TEXT("Icons/StateMachine-16"), Icon16x16));
+	StyleSet->Set("ClassThumbnail.StateMachineBlueprint", new PLUGIN_BRUSH(TEXT("Icons/StateMachine-40"), Icon40x40));
 
 	// Toolbar
-	StyleSet->Set("FrameworkNpcToolbar.Bp", new IMAGE_BRUSH("Icons/NpcBehavior-ToolbarBp-40", Icon40x40));
-	StyleSet->Set("FrameworkNpcToolbar.BpSmall", new IMAGE_BRUSH("Icons/NpcBehavior-ToolbarBp-20", Icon20x20));
+	StyleSet->Set("FrameworkGraphToolbar.Bp", new IMAGE_BRUSH("Icons/Graph-ToolbarBp-40", Icon40x40));
+	StyleSet->Set("FrameworkGraphToolbar.BpSmall", new IMAGE_BRUSH("Icons/Graph-ToolbarBp-20", Icon20x20));
 	StyleSet->Set("FrameworkNpcToolbar.Npc", new IMAGE_BRUSH("Icons/NpcBehavior-ToolbarNpc-40", Icon40x40));
 	StyleSet->Set("FrameworkNpcToolbar.NpcSmall", new IMAGE_BRUSH("Icons/NpcBehavior-ToolbarNpc-20", Icon20x20));
+	StyleSet->Set("FrameworkStateMachineToolbar.StateMachine", new IMAGE_BRUSH("Icons/StateMachine-ToolbarStateMachine-40", Icon40x40));
+	StyleSet->Set("FrameworkStateMachineToolbar.StateMachineSmall", new IMAGE_BRUSH("Icons/StateMachine-ToolbarStateMachine-20", Icon20x20));
 
 	// Graph
 	StyleSet->Set("FrameworkGraph.NodeBody", new BOX_BRUSH(TEXT("Graph/NodeBody"), FMargin(4.f / 64.f, 4.f / 64.f, 4.f / 64.f, 4.f / 64.f)));
@@ -71,6 +77,16 @@ void FFrameworkStyle::Initialize()
 	StyleSet->Set("FrameworkGraph.RegularNodeShadow", new BOX_BRUSH(TEXT("Graph/RegularNodeShadow"), FMargin(18.0f / 64.0f)));
 	StyleSet->Set("FrameworkGraph.RegularNodeTitleNormal", new BOX_BRUSH(TEXT("Graph/RegularNodeTitleNormal"), FMargin(12.0f / 64.0f)));
 	StyleSet->Set("FrameworkGraph.RegularNodeTitleHighlight", new BOX_BRUSH(TEXT("Graph/RegularNodeTitleHighlight"), FMargin(16.0f / 64.0f, 1.0f, 16.0f / 64.0f, 0.0f)));
+
+	// State Machine 
+	StyleSet->Set("FrameworkGraph.StateMachine.NodeBody", new BOX_BRUSH(TEXT("Graph/StateMachine/NodeBody"), FMargin(16.f / 64.f, 25.f / 64.f, 16.f / 64.f, 16.f / 64.f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.NodeBodySelected", new BOX_BRUSH(TEXT("Graph/StateMachine/NodeBodySelected"), FMargin(18.0f / 64.0f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.NodeBodyColorSpill", new BOX_BRUSH(TEXT("Graph/StateMachine/NodeBodyColorSpill"), FMargin(4.0f / 64.0f, 4.0f / 32.0f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.NodePinHoverCue", new BOX_BRUSH(TEXT("Graph/StateMachine/NodePinHoverCue"), FMargin(12.0f / 64.0f, 12.0f / 64.0f, 12.0f / 64.0f, 12.0f / 64.0f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.Icon", new IMAGE_BRUSH("Graph/StateMachine/NodeIcon", Icon16x16));
+	StyleSet->Set("FrameworkGraph.StateMachine.TransitionNodeBody", new BOX_BRUSH("Graph/StateMachine/TransNodeBody", FMargin(16.f / 64.f, 12.f / 28.f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.TransitionNodeColorSpill", new BOX_BRUSH("Graph/StateMachine/TransNodeColorSpill", (16.f / 64.f, 16.f / 28.f, 16.f / 64.f, 4.f / 28.f)));
+	StyleSet->Set("FrameworkGraph.StateMachine.TransitionNodeIcon", new IMAGE_BRUSH("Graph/StateMachine/TransNodeIcon", FVector2D(25, 25)));
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 }
