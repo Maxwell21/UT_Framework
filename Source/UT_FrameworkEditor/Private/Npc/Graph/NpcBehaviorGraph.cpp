@@ -176,7 +176,7 @@ void UNpcBehaviorGraph::CheckEntryNodeIsSet(UNpcBehaviorGraphNode* FromNode, UNp
 
 UObject* UNpcBehaviorGraph::PrepareOuter()
 {
-	return this->NpcBehaviorBlueprint->GeneratedClass;
+	return this->NpcBehaviorBlueprint;
 }
 
 void UNpcBehaviorGraph::SetNextTask(UEdGraphPin* FromPin, UNpcBehaviorGraphNode* ToNode)
@@ -189,7 +189,8 @@ void UNpcBehaviorGraph::SetNextTask(UEdGraphPin* FromPin, UNpcBehaviorGraphNode*
 	if (Cast<UNpcBehaviorGraphNode_Multiple>(FromNode) && Cast<UNpcBehaviorTask_Multiple>(FromNode->Task))
 	{
 		UNpcBehaviorTask_Multiple* MultipleTask = Cast<UNpcBehaviorTask_Multiple>(FromNode->Task);
-		int32 CurrentPinIndex = FromNode->GetPinIndex(FromPin);
+		// minus one because MultipleTargets don't take account of InputPin 
+		int32 CurrentPinIndex = FromNode->GetPinIndex(FromPin) - 1;
 		for (int32 Index = 0; Index < MultipleTask->MultipleTargets.Num(); Index++)
 		{
  			if (Index == CurrentPinIndex && MultipleTask->MultipleTargets.IsValidIndex(Index))

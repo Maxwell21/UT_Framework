@@ -32,7 +32,7 @@ protected:
 	/**
 	 * Runtime instance
 	 */
-	UPROPERTY()
+	UPROPERTY(Category = "Npc", BlueprintReadOnly, meta=(DisplayName="Runtime"))
 	UNpcBehavior* NpcBehavior;
 
 public:

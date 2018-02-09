@@ -99,7 +99,7 @@ void FNpcBehaviorBlueprintEditorToolbar::FillWidgetBlueprintEditorModesToolbar(F
 				NULL,
 				TEXT("Shared/Editors/BlueprintEditor"),
 				TEXT("NpcMode")))
-			.IconImage(FFrameworkStyle::GetBrush("FrameworkNpcToolbar.Noc"))
+			.IconImage(FFrameworkStyle::GetBrush("FrameworkNpcToolbar.Npc"))
 			.SmallIconImage(FFrameworkStyle::GetBrush("FrameworkNpcToolbar.NpcSmall"))
 			.AddMetaData<FTagMetaData>(FTagMetaData(TEXT("NpcMode")))
 		);
@@ -117,8 +117,8 @@ void FNpcBehaviorBlueprintEditorToolbar::FillWidgetBlueprintEditorModesToolbar(F
 				TEXT("Shared/Editors/BlueprintEditor"),
 				TEXT("GraphMode")))
 			.ToolTipText(LOCTEXT("GraphModeButtonTooltip", "Switch to Graph Editing Mode"))
-			.IconImage(FFrameworkStyle::GetBrush("FrameworkNpcToolbar.Bp"))
-			.SmallIconImage(FFrameworkStyle::GetBrush("FrameworkNpcToolbar.BpSmall"))
+			.IconImage(FFrameworkStyle::GetBrush("FrameworkGraphToolbar.Bp"))
+			.SmallIconImage(FFrameworkStyle::GetBrush("FrameworkGraphToolbar.BpSmall"))
 			.AddMetaData<FTagMetaData>(FTagMetaData(TEXT("GraphMode")))
 		);
 		

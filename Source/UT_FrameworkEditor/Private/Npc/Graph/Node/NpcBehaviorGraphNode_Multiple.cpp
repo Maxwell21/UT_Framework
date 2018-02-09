@@ -32,14 +32,14 @@ FLinearColor UNpcBehaviorGraphNode_Multiple::GetNodeTitleColor() const
 
 void UNpcBehaviorGraphNode_Multiple::CleanAllOutputsPin()
 {
-	if (Pins.Num() > 0)
-	{
-		for (auto PinToRemove : this->Pins)
-		{
-			if (PinToRemove->Direction == EGPD_Output)
-				RemovePin(PinToRemove);
-		}
-	}
+// 	if (Pins.Num() > 0)
+// 	{
+// 		for (auto PinToRemove : this->Pins)
+// 		{
+//  			if (PinToRemove->Direction == EGPD_Output)
+// 				RemovePin(PinToRemove);
+// 		}
+// 	}
 }
 
 void UNpcBehaviorGraphNode_Multiple::RefreshAllOutputPins()

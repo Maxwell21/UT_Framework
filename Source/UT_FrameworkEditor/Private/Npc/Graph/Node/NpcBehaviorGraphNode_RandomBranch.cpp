@@ -16,6 +16,7 @@ UNpcBehaviorGraphNode_RandomBranch::UNpcBehaviorGraphNode_RandomBranch(const FOb
 
 void UNpcBehaviorGraphNode_RandomBranch::ReconstructNode()
 {
+	UEdGraphNode::ReconstructNode();
 	this->InputPin = this->Pins[0];
 	this->RefreshAllOutputPins();
 
@@ -43,19 +44,35 @@ FLinearColor UNpcBehaviorGraphNode_RandomBranch::GetNodeTitleColor() const
 
 void UNpcBehaviorGraphNode_RandomBranch::RefreshAllOutputPins()
 {
-	this->CleanAllOutputsPin();
-
 	if (UNpcBehaviorTask_RandomBranch* RandomBranchTask = Cast<UNpcBehaviorTask_RandomBranch>(this->Task))
 	{
-		for (int32 Index = 0; Index < RandomBranchTask->Number; ++Index)
+		int32 Index = 0;
+		for (Index; Index < RandomBranchTask->Number; Index++)
 		{
 			if (RandomBranchTask->MultipleTargets.IsValidIndex(Index) == false)
 			{
 				UEdGraphPin* NewPin = CreatePin(EGPD_Output, TEXT("RandomBranch"), FString(), nullptr, TEXT(""));
-				this->MultipleOutputPins.AddUnique(NewPin);
+				this->MultipleOutputPins.Add(NewPin);
 
 				FNpcBehaviorTask_MultipleTarget Target;
 				RandomBranchTask->MultipleTargets.Add(Target);
+			}
+
+			if (this->MultipleOutputPins.IsValidIndex(Index) == false)
+			{
+				UEdGraphPin* NewPin = CreatePin(EGPD_Output, TEXT("RandomBranch"), FString(), nullptr, TEXT(""));
+				this->MultipleOutputPins.Add(NewPin);
+			}
+		}
+
+		int32 Count = this->MultipleOutputPins.Num();
+		for (Count; Count > Index; Count--)
+		{
+			// Remove only output pins
+			if (this->MultipleOutputPins.IsValidIndex(Count-1))
+			{
+				RandomBranchTask->MultipleTargets.RemoveAt(Count-1);
+				this->MultipleOutputPins.RemoveAt(Count-1);
 			}
 		}
 	}

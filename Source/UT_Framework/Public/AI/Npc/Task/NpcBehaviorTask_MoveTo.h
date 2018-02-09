@@ -27,16 +27,17 @@ public:
 	/************************************************************************/
 
 	UPROPERTY(Category = "Npc MoveTo", EditDefaultsOnly)
-	FVector GoalLocation;
+	FName TargetVariable;
 
-	UPROPERTY(Category = "Npc MoveTo", EditDefaultsOnly)
-	AActor* GoalTarget;
+protected:
 
 	FVector Target;
 
 	UNavigationSystem* NavSystem;
 
 	bool GoalReached = false;
+
+public:
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
@@ -47,4 +48,5 @@ public:
 	UFUNCTION()
 	virtual void TickTask(float DeltaTime) override;
 
+	void SetTargetLocation();
 };
