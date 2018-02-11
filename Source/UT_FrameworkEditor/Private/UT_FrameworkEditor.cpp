@@ -33,6 +33,10 @@
 #include "AssetTypeActions_NpcBehavior.h"
 #include "AssetTypeActions_StateMachine.h"
 
+// Debuggers
+#include "GameplayDebugger.h"
+#include "GDC_StateMachine.h"
+
 #define LOCTEXT_NAMESPACE "FUT_FrameworkEditorModule"
 
 void FUT_FrameworkEditorModule::StartupModule()
@@ -59,6 +63,14 @@ void FUT_FrameworkEditorModule::StartupModule()
 	// NpcBehaviorTasks
 	this->RegisterNpcBehaviorTasks();
 
+	// Debuggers
+	#if WITH_GAMEPLAY_DEBUGGER
+		//If the gameplay debugger is available, register the category and notify the editor about the changes
+		IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
+		GameplayDebuggerModule.RegisterCategory("UmbraFramework", IGameplayDebugger::FOnGetCategory::CreateStatic(&FGDC_StateMachine::MakeInstance), EGameplayDebuggerCategoryState::EnabledInGameAndSimulate);
+		GameplayDebuggerModule.NotifyCategoriesChanged();
+	#endif
+
 	// AssetsActions
 	this->RegisterAssetActions();
 }
@@ -76,6 +88,15 @@ void FUT_FrameworkEditorModule::ShutdownModule()
 	FEdGraphUtilities::UnregisterVisualNodeFactory(NpcBehaviorGraphFactory);
 	FEdGraphUtilities::UnregisterVisualNodeFactory(StateMachineGraphFactory);
 	FEdGraphUtilities::UnregisterVisualPinConnectionFactory(StateMachineGraphPinConnectionFactory);
+
+	// Debuggers
+	#if WITH_GAMEPLAY_DEBUGGER
+	if (IGameplayDebugger::IsAvailable())
+	{
+		IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
+		GameplayDebuggerModule.UnregisterCategory("UmbraFramework");
+	}
+	#endif
 }
 
 TSharedRef<FAssetEditorToolkit> FUT_FrameworkEditorModule::CreateNpcEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UNpcBehaviorBlueprint* Blueprint)
