@@ -43,6 +43,7 @@ public class UT_Framework : ModuleRules
                 "SlateCore",
                 "UMG",
                 "AIModule",
+                "Paper2D",
                 "GameplayTasks",
 				// ... add private dependencies that you statically link with here ...	
 			}
