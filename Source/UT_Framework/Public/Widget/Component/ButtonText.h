@@ -27,6 +27,8 @@ public:
 	
 	PROPERTY_BINDING_IMPLEMENTATION(FText, Text);
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateColor, TextColorAndOpacity);
+	PROPERTY_BINDING_IMPLEMENTATION(FSlateColor, TextColorAndOpacityHover);
+	PROPERTY_BINDING_IMPLEMENTATION(FSlateColor, TextColorAndOpacityPressed);
 	PROPERTY_BINDING_IMPLEMENTATION(FLinearColor, TextShadowColorAndOpacity);
 
 	/************************************************************************/
@@ -56,6 +58,22 @@ public:
 	/** A bindable delegate for the ColorAndOpacity. */
 	UPROPERTY()
 	FGetSlateColor TextColorAndOpacityDelegate;
+
+	/** The color of the text */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	FSlateColor TextColorAndOpacityHover;
+
+	/** A bindable delegate for the TextColorAndOpacityHover. */
+	UPROPERTY()
+	FGetSlateColor TextColorAndOpacityHoverDelegate;
+
+	/** The color of the text */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	FSlateColor TextColorAndOpacityPressed;
+
+	/** A bindable delegate for the TextColorAndOpacityPressed. */
+	UPROPERTY()
+	FGetSlateColor TextColorAndOpacityPressedDelegate;
 
 	/** The font to render the text with */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")

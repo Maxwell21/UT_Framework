@@ -64,7 +64,9 @@ void UButtonText::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	MyTextBlock->SetText(Text);
+	TAttribute<FText> RenderText = (TextDelegate.IsBound()) ? PROPERTY_BINDING(FText, Text) : Text;
+	
+	MyTextBlock->SetText(RenderText);
 	MyTextBlock->SetColorAndOpacity(TextColorAndOpacity);
 	MyTextBlock->SetFont(TextFont);
 	MyTextBlock->SetJustification(TextJustification);
