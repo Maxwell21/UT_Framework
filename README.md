@@ -5,7 +5,7 @@ Features
 [WIDGET]
 - Navigable Widgets (Navigation system for UMG (Keyboard + Gamepad)) [STABLE] [BRANCH => master]
 - RichText (Same as the engine but can be used now)
-- BUttonText (Same as the button but with a textblock as child with editable properties)
+- ButtonText (Same as the button but with a textblock as child with editable properties)
 
 [STATE MACHINE]
 - State Machine (Create state machine system and start it from any object) [STABLE BUT NEED POLISH/REFACTO] [BRANCH => master]
