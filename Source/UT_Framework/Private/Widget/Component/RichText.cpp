@@ -70,7 +70,7 @@ void URichText::SynchronizeProperties()
 
 const FText URichText::GetPaletteCategory()
 {
-	return LOCTEXT("Common", "Common");
+	return LOCTEXT("UmbraFramework", "Umbra Framework");
 }
 
 void URichText::OnCreationFromPalette()

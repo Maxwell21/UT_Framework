@@ -12,8 +12,6 @@
 
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FDelegateMapRangeTimer, float, TimeElapsed, float, InValue, float, OutValue);
 
-#define PREFIX_MAP_TIMER_NAME TEXT("TIMER_MAP_RANGE_");
-
 USTRUCT()
 struct FTimerMapRangeData
 {
