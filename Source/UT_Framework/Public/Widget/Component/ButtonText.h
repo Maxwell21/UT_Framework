@@ -36,7 +36,7 @@ public:
 	/************************************************************************/
 
 	/** The text to display */
-	UPROPERTY(EditAnywhere, Category = "Text", meta = (MultiLine = "true"))
+	UPROPERTY(Category = "Text", EditAnywhere, meta = (MultiLine = "true"))
 	FText Text;
 
 	/** A bindable delegate to allow logic to drive the text of the widget */
@@ -44,15 +44,15 @@ public:
 	FGetText TextDelegate;
 
 	/** The text justification*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ETextJustify::Type> TextJustification;
 
 	/** The text margin */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FMargin TextMargin;
 
 	/** The color of the text */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FSlateColor TextColorAndOpacity;
 
 	/** A bindable delegate for the ColorAndOpacity. */
@@ -60,7 +60,7 @@ public:
 	FGetSlateColor TextColorAndOpacityDelegate;
 
 	/** The color of the text */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FSlateColor TextColorAndOpacityHover;
 
 	/** A bindable delegate for the TextColorAndOpacityHover. */
@@ -68,7 +68,7 @@ public:
 	FGetSlateColor TextColorAndOpacityHoverDelegate;
 
 	/** The color of the text */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FSlateColor TextColorAndOpacityPressed;
 
 	/** A bindable delegate for the TextColorAndOpacityPressed. */
@@ -76,15 +76,15 @@ public:
 	FGetSlateColor TextColorAndOpacityPressedDelegate;
 
 	/** The font to render the text with */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FSlateFontInfo TextFont;
 
 	/** The direction the shadow is cast */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly)
 	FVector2D TextShadowOffset;
 
 	/** The color of the shadow */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text", meta = (DisplayName = "Shadow Color"))
+	UPROPERTY(Category = "Text", EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Shadow Color"))
 	FLinearColor TextShadowColorAndOpacity;
 
 	/** A bindable delegate for the ShadowColorAndOpacity. */
@@ -104,6 +104,16 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void SynchronizeProperties() override;
 	//~ End UWidget Interface
+	
+	/** Force state style to display */
+	UFUNCTION(Category = "Button", BlueprintCallable)
+	virtual void ForceNormal();
+	
+	UFUNCTION(Category = "Button", BlueprintCallable)
+	virtual void ForceHover();
+
+	UFUNCTION(Category = "Button", BlueprintCallable)
+	virtual void ForcePressed();
 
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;

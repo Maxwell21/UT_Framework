@@ -73,6 +73,30 @@ void UButtonText::SynchronizeProperties()
 	MyTextBlock->SetMargin(TextMargin);
 }
 
+void UButtonText::ForceNormal()
+{
+	FButtonStyle ButtonStyle;
+	ButtonStyle.Normal = this->WidgetStyle.Normal;
+	this->SetStyle(ButtonStyle);
+	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacity);
+}
+
+void UButtonText::ForceHover()
+{
+	FButtonStyle ButtonStyle;
+	ButtonStyle.Normal = this->WidgetStyle.Hovered;
+	this->SetStyle(ButtonStyle);
+	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacityHover);
+}
+
+void UButtonText::ForcePressed()
+{
+	FButtonStyle ButtonStyle;
+	ButtonStyle.Normal = this->WidgetStyle.Pressed;
+	this->SetStyle(ButtonStyle);
+	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacityPressed);
+}
+
 #if WITH_EDITOR
 
 const FText UButtonText::GetPaletteCategory()
