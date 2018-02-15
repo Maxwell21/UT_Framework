@@ -145,4 +145,13 @@ void UNavigableVerticalBox::UnFocusAllNavigableWidget()
 	}
 }
 
+#if WITH_EDITOR
+
+const FText UNavigableVerticalBox::GetPaletteCategory()
+{
+	return LOCTEXT("UmbraFramework", "Umbra Framework");
+}
+
+#endif
+
 #undef LOCTEXT_NAMESPACE

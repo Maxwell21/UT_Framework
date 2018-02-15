@@ -105,7 +105,6 @@ protected:
 	virtual void SynchronizeProperties() override;
 	//~ End UWidget Interface
 
-
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
 #endif
