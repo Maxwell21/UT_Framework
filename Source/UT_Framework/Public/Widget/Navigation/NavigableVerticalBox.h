@@ -85,4 +85,8 @@ protected:
 	virtual void HandleConfirmKeyPressed();
 	virtual void UnFocusAllNavigableWidget();
 
+#if WITH_EDITOR
+	virtual const FText GetPaletteCategory() override;
+#endif
+
 };
