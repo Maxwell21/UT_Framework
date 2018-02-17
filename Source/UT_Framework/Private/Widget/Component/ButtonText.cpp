@@ -57,6 +57,8 @@ TSharedRef<SWidget> UButtonText::RebuildWidget()
 	if (GetChildrenCount() > 0)
 		Cast<UButtonSlot>(GetContentSlot())->BuildSlot(MyButton.ToSharedRef());
 
+	this->NormalButtonStateCached = this->WidgetStyle.Normal;
+
 	return MyButton.ToSharedRef();
 }
 
@@ -75,25 +77,22 @@ void UButtonText::SynchronizeProperties()
 
 void UButtonText::ForceNormal()
 {
-	FButtonStyle ButtonStyle;
-	ButtonStyle.Normal = this->WidgetStyle.Normal;
-	this->SetStyle(ButtonStyle);
+	this->WidgetStyle.Normal = this->NormalButtonStateCached;
+	this->SetStyle(this->WidgetStyle);
 	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacity);
 }
 
 void UButtonText::ForceHover()
 {
-	FButtonStyle ButtonStyle;
-	ButtonStyle.Normal = this->WidgetStyle.Hovered;
-	this->SetStyle(ButtonStyle);
+	this->WidgetStyle.Normal = this->WidgetStyle.Hovered;
+	this->SetStyle(this->WidgetStyle);
 	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacityHover);
 }
 
 void UButtonText::ForcePressed()
 {
-	FButtonStyle ButtonStyle;
-	ButtonStyle.Normal = this->WidgetStyle.Pressed;
-	this->SetStyle(ButtonStyle);
+	this->WidgetStyle.Normal = this->WidgetStyle.Pressed;
+	this->SetStyle(this->WidgetStyle);
 	MyTextBlock->SetColorAndOpacity(this->TextColorAndOpacityPressed);
 }
 

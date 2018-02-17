@@ -63,7 +63,7 @@ void UNavigableVerticalBox::BindInputs()
 void UNavigableVerticalBox::UnBindInputs()
 {
 	if (this->InputComponent)
-		this->InputComponent->ClearActionBindings();
+		this->InputComponent->DestroyComponent();
 }
 
 UNavigableWidget* UNavigableVerticalBox::GetFocusedNavigationWidget()

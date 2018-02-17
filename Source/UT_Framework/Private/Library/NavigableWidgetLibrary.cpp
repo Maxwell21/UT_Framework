@@ -9,30 +9,17 @@
 #include "NavigableWidgetInterface.h"
 #include "UObjectIterator.h"
 
-void UNavigableWidgetLibrary::InitializeAllContainers()
-{
-	for (TObjectIterator<UObject> Itr; Itr; ++Itr)
-	{
-		UObject* Object = *Itr;
-		if (INavigableWidgetInterface* NavigableInterface = Cast<INavigableWidgetInterface>(Object))
-			NavigableInterface->Initialize();
-	}
-}
-
 void UNavigableWidgetLibrary::SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container)
 {
 	if (!Container || !Container->ContainNavigableWidget())
 		return;
 
 	// unfocus all + unbind 
-	if (UNavigableWidgetLibrary::GetActiveNavigableContainer())
-	{
-		UNavigableWidgetLibrary::GetActiveNavigableContainer()->UnBindInputs();
-		UNavigableWidgetLibrary::GetActiveNavigableContainer()->UnFocusAllNavigableWidget();
-	}
+	if (INavigableWidgetInterface* NavigableInterface = (INavigableWidgetInterface*)(UNavigableWidgetLibrary::GetActiveNavigableContainer().GetInterface()))
+		NavigableInterface->Shutdown();
 
 	// Focus first
-	Container->BindInputs();
+	Container->Initialize();
 	Container->IsActive = true;
 	UNavigableWidgetLibrary::FocusNavigableWidget(Container, Container->GetFirstNavigableWidget());
 }
