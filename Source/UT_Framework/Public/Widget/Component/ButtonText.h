@@ -93,6 +93,9 @@ public:
 
 protected:
 
+	/** Cached Normal button style */
+	FSlateBrush NormalButtonStateCached;
+
 	/** Cached pointer to the underlying slate button owned by this UWidget */
 	TSharedPtr<STextBlock> MyTextBlock;
 

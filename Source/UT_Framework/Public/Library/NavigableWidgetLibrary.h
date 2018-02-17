@@ -27,12 +27,6 @@ public:
 	/************************************************************************/
 
 	/**
-	 * Loop through all UNavigableWidgetInterface valid and tell them to initialize
-	 */
-	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
-	static void InitializeAllContainers();
-
-	/**
 	* Used for changing navigable container
 	*
 	* @param INavigableWidgetInterface Container

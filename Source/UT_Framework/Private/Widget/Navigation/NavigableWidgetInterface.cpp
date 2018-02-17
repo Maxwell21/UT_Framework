@@ -12,6 +12,15 @@
 void INavigableWidgetInterface::Initialize()
 {
 	this->InitializeInputComponent();
+	this->BindInputs();
+	this->Initialized = true;
+}
+
+void INavigableWidgetInterface::Shutdown()
+{
+	this->UnBindInputs();
+	this->UnFocusAllNavigableWidget();
+	this->Initialized = false;
 }
 
 void INavigableWidgetInterface::InitializeInputComponent()
