@@ -9,7 +9,7 @@ Features
 
 [STATE MACHINE]
 - State Machine (Create state machine system and start it from any object) [STABLE BUT NEED POLISH/REFACTO] [BRANCH => master]
-![alt text](https://image.ibb.co/dBXf37/SM_Overview.gif)
+[gif demo](https://image.ibb.co/dBXf37/SM_Overview.gif)
 
 [NPC]
 - Npc Behavior (Manipulate NPC through a custom node graph system) [WORK IN PROGRESS] [BRANCH => feature/npc-behavior]
