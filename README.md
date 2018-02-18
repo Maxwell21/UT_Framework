@@ -3,7 +3,7 @@
 Features 
 
 [WIDGET]
-- Navigable Widgets (Navigation system for UMG (Keyboard + Gamepad))
+- Navigable Widgets (Navigation system for UMG (Keyboard + Gamepad)
 - RichText (Same as the engine but can be used now) ([GIF PREVIEW](https://image.ibb.co/mRCjgS/Rich_Text_Overview.gif))
 - ButtonText (Same as the button but with a textblock as child with editable properties) ([GIF PREVIEW](http://image.ibb.co/h485Ln/Button_Text_Overview.gif))
 
