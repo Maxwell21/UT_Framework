@@ -33,6 +33,8 @@ public:
 	
 	UInputComponent* InputComponent;
 
+	bool Initialized;
+
 	bool IsActive;
 
 	/************************************************************************/
@@ -40,6 +42,8 @@ public:
 	/************************************************************************/
 
 	virtual void Initialize();
+
+	virtual void Shutdown();
 
 	virtual void InitializeInputComponent();
 

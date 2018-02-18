@@ -63,7 +63,7 @@ void UNavigableVerticalBox::BindInputs()
 void UNavigableVerticalBox::UnBindInputs()
 {
 	if (this->InputComponent)
-		this->InputComponent->ClearActionBindings();
+		this->InputComponent->DestroyComponent();
 }
 
 UNavigableWidget* UNavigableVerticalBox::GetFocusedNavigationWidget()
@@ -144,5 +144,14 @@ void UNavigableVerticalBox::UnFocusAllNavigableWidget()
 		Widget->LoseFocus();
 	}
 }
+
+#if WITH_EDITOR
+
+const FText UNavigableVerticalBox::GetPaletteCategory()
+{
+	return LOCTEXT("UmbraFramework", "Umbra Framework");
+}
+
+#endif
 
 #undef LOCTEXT_NAMESPACE
