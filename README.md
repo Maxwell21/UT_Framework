@@ -8,9 +8,7 @@ Features
 - ButtonText (Same as the button but with a textblock as child with editable properties) ([GIF PREVIEW](http://image.ibb.co/h485Ln/Button_Text_Overview.gif))
 
 [STATE MACHINE]
-- State Machine (Create state machine system and start it from any object) [STABLE BUT NEED POLISH/REFACTO] [BRANCH => master]
-
-[GIF PREVIEW](https://image.ibb.co/dBXf37/SM_Overview.gif)
+- State Machine (Create state machine system and start it from any object) [STABLE BUT NEED POLISH/REFACTO] ([GIF PREVIEW](https://image.ibb.co/dBXf37/SM_Overview.gif))
 
 [NPC]
 - Npc Behavior (Manipulate NPC through a custom node graph system) [WORK IN PROGRESS] [BRANCH => feature/npc-behavior]
