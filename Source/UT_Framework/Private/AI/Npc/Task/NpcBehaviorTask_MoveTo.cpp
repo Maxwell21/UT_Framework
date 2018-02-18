@@ -20,6 +20,7 @@ void UNpcBehaviorTask_MoveTo::Execute()
 
 	if (this->IsValid())
 	{
+		this->GoalReached = false;
 		this->NavSystem = UNavigationSystem::GetCurrent(this->OwnerNpcBehavior->GetOwnerWorldObject());
 		UWorld* World = GEngine->GetWorldFromContextObjectChecked(this->OwnerNpcBehavior->GetOwnerWorldObject());
 		if (this->NavSystem && World)
@@ -41,7 +42,7 @@ void UNpcBehaviorTask_MoveTo::TickTask(float DeltaTime)
 		this->NavSystem->SimpleMoveToLocation(this->OwnerNpcBehavior->OwnerController, Target);
 		FVector MyVector(this->OwnerNpcBehavior->GetOwnerWorldObject()->GetActorLocation() - this->Target);
 		
-		if (MyVector.Size() < 25)
+		if (MyVector.Size() < 45)
 		{
 			this->GoalReached = true;
 			this->ExecuteNextTask();
@@ -51,23 +52,19 @@ void UNpcBehaviorTask_MoveTo::TickTask(float DeltaTime)
 
 void UNpcBehaviorTask_MoveTo::SetTargetLocation()
 {
-	for (TFieldIterator<UProperty> PropIt(GetClass(), EFieldIteratorFlags::IncludeSuper); PropIt; ++PropIt)
+	for (TFieldIterator<UProperty> PropIt(this->OwnerNpcBehavior->GetClass(), EFieldIteratorFlags::IncludeSuper); PropIt; ++PropIt)
 	{
 		UProperty* Property = *PropIt;
-
-		#if WITH_EDITOR
-				UE_LOG(LogTemp, Warning, TEXT("%s == %s"), *PropIt->GetName(), *this->TargetVariable.ToString());
-		#endif
 		if (Property->GetName() == this->TargetVariable.ToString())
 		{
-			if (UObjectProperty* VectorProperty = Cast<UObjectProperty>(Property))
+			if (UObjectProperty* ObjectProperty = Cast<UObjectProperty>(Property))
 			{
-				if (AActor* Actor = Cast<AActor>(VectorProperty->GetPropertyValue_InContainer(this)))
+				if (AActor* Actor = Cast<AActor>(ObjectProperty->GetPropertyValue_InContainer(this->OwnerNpcBehavior)))
 					this->Target = Actor->GetActorLocation();
 			}
 			else
 			{
-				if (FVector* Location = Property->ContainerPtrToValuePtr<FVector>(this))
+				if (FVector* Location = Property->ContainerPtrToValuePtr<FVector>(this->OwnerNpcBehavior))
 					this->Target = *Location;
 			}
 		}

@@ -55,6 +55,7 @@ void UNpcBehaviorGraphNode_RandomBranch::RefreshAllOutputPins()
 				this->MultipleOutputPins.Add(NewPin);
 
 				FNpcBehaviorTask_MultipleTarget Target;
+				Target.NextTask = nullptr;
 				RandomBranchTask->MultipleTargets.Add(Target);
 			}
 

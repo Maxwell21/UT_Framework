@@ -46,4 +46,9 @@ public:
 	/************************************************************************/
 
 	UNpcBehavior* GetNpcBehavior();
+
+#if WITH_EDITOR
+	virtual UClass* GetBlueprintClass() const override;
+#endif
+
 };

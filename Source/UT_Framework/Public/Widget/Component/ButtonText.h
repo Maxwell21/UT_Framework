@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/Button.h"
+#include "TextLayout.h"
 #include "ButtonText.generated.h"
 
 class STextBlock;

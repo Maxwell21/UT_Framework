@@ -10,6 +10,7 @@
 #include "NpcBehaviorBlueprint.h"
 #include "NpcBehaviorGraphFactory.h"
 #include "NpcBehaviorUtilities.h"
+#include "NpcBehaviorBlueprintCompiler.h"
 
 // StateMachine
 #include "StateMachineEditor.h"
@@ -133,14 +134,21 @@ void FUT_FrameworkEditorModule::RegisterNpcBehaviorTasks()
 
 bool FUT_FrameworkEditorModule::CanCompile(const UBlueprint* Blueprint)
 {
-	return Cast<UStateMachineBlueprint>(Blueprint) != nullptr;
+	return Cast<UStateMachineBlueprint>(Blueprint) != nullptr
+		|| Cast<UNpcBehaviorBlueprint>(Blueprint) != nullptr;
 }
 
 void FUT_FrameworkEditorModule::Compile(UBlueprint* Blueprint, const FKismetCompilerOptions& CompileOptions, FCompilerResultsLog& Results, TArray<UObject *>* ObjLoaded)
 {
-	if (UStateMachineBlueprint* StateMachineBlueprint = CastChecked<UStateMachineBlueprint>(Blueprint))
+	if (UStateMachineBlueprint* StateMachineBlueprint = Cast<UStateMachineBlueprint>(Blueprint))
 	{
 		FStateMachineBlueprintCompiler Compiler(StateMachineBlueprint, Results, CompileOptions, ObjLoaded);
+		Compiler.Compile();
+		check(Compiler.NewClass);
+	}
+	else if (UNpcBehaviorBlueprint* NpcBehaviorBlueprint = Cast<UNpcBehaviorBlueprint>(Blueprint))
+	{
+		FNpcBehaviorBlueprintCompiler Compiler(NpcBehaviorBlueprint, Results, CompileOptions, ObjLoaded);
 		Compiler.Compile();
 		check(Compiler.NewClass);
 	}

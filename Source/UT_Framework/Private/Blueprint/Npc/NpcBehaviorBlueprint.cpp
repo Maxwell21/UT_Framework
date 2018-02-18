@@ -4,9 +4,18 @@
 /************************************************************************/
 
 #include "NpcBehaviorBlueprint.h"
+#include "NpcBehaviorBlueprintGeneratedClass.h"
 #include "NpcBehavior.h"
 
 UNpcBehavior* UNpcBehaviorBlueprint::GetNpcBehavior()
 {
-	return this->GeneratedClass->GetDefaultObject<UNpcBehavior>();
+	UNpcBehavior* NpcBehavior = this->GeneratedClass->GetDefaultObject<UNpcBehavior>();
+	return NpcBehavior;
 }
+
+#if WITH_EDITOR
+UClass* UNpcBehaviorBlueprint::GetBlueprintClass() const
+{
+	return UNpcBehaviorBlueprintGeneratedClass::StaticClass();
+}
+#endif

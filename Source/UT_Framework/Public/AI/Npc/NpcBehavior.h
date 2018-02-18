@@ -19,7 +19,7 @@ class AAIController;
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS()
 class UT_FRAMEWORK_API UNpcBehavior : public UObject, public IGameplayTaskOwnerInterface
 {
 	GENERATED_BODY()

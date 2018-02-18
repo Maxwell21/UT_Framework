@@ -15,7 +15,6 @@ UNpcBehaviorGraphNode_MoveTo::UNpcBehaviorGraphNode_MoveTo(const FObjectInitiali
 
 FText UNpcBehaviorGraphNode_MoveTo::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-
 	return FText::FromString("MoveTo");
 }
 

@@ -176,7 +176,7 @@ void UNpcBehaviorGraph::CheckEntryNodeIsSet(UNpcBehaviorGraphNode* FromNode, UNp
 
 UObject* UNpcBehaviorGraph::PrepareOuter()
 {
-	return this->NpcBehaviorBlueprint;
+	return this->NpcBehaviorBlueprint->GetNpcBehavior();
 }
 
 void UNpcBehaviorGraph::SetNextTask(UEdGraphPin* FromPin, UNpcBehaviorGraphNode* ToNode)
