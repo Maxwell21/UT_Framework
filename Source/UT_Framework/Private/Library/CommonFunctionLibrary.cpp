@@ -11,7 +11,7 @@
 
 TMap<FName, FTimerMapRangeData> UCommonFunctionLibrary::TimeMapRangeData = TMap<FName, FTimerMapRangeData>();
 
-FName UCommonFunctionLibrary::SetMapRangeTimerByEvent(const UObject* WorldContextObject, FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Looping)
+FName UCommonFunctionLibrary::SetMapRangeTimerByEvent(const UObject* WorldContextObject, FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Reverse, bool Looping)
 {
 	FTimerHandle Handler;
 	FName Key;
@@ -24,15 +24,17 @@ FName UCommonFunctionLibrary::SetMapRangeTimerByEvent(const UObject* WorldContex
 
 			FTimerDelegate Delegate;
 			FTimerMapRangeData Data = FTimerMapRangeData();
+			if (Reverse)
+				Data.TimerValue = InB;
 
 			UCommonFunctionLibrary::TimeMapRangeData.Add(Key, Data);
 			
-			Delegate.BindLambda([] (FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Looping, FName Key)
+			Delegate.BindLambda([] (FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Reverse, bool Looping, FName Key)
 			{
 				if (FTimerMapRangeData* Data = UCommonFunctionLibrary::TimeMapRangeData.Find(Key))
 				{
 					Data->TimeElapsed += Time;
-					Data->TimerValue  += Value;
+					Data->TimerValue  = (Reverse) ? FMath::Clamp<float>(Data->TimerValue - Value, InA, InB) : FMath::Clamp<float>(Data->TimerValue + Value, InA, InB);
 
 					if (!Looping)
 						Event.Execute(Data->TimeElapsed, InB, OutB);
@@ -42,7 +44,7 @@ FName UCommonFunctionLibrary::SetMapRangeTimerByEvent(const UObject* WorldContex
 						Event.Execute(Data->TimeElapsed, Data->TimerValue, ResultValue);
 					}
 				}
-			}, Event, Time, Value, InA, InB, OutA, OutB, Looping, Key);
+			}, Event, Time, Value, InA, InB, OutA, OutB, Reverse, Looping, Key);
 			World->GetTimerManager().SetTimer(Handler, Delegate, Time, Looping);
 
 			// Update Handler

@@ -60,7 +60,7 @@ public:
 	 * Create a timer which map value on range and return output value between them
 	 */
 	UFUNCTION(Category = "Umbra Framework | CommonLibrary", BlueprintCallable, meta = (WorldContext="WorldContextObject"))
-	static FName SetMapRangeTimerByEvent(const UObject* WorldContextObject, FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Looping);
+	static FName SetMapRangeTimerByEvent(const UObject* WorldContextObject, FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Reverse, bool Looping);
 
 	/**
 	 * Pause a map range timer
