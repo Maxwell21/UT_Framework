@@ -67,8 +67,8 @@ public:
 protected:
 
 	// UPanelWidget
-	virtual void OnSlotAdded(UPanelSlot* Slot) override;
-	virtual void OnSlotRemoved(UPanelSlot* Slot) override;
+	virtual void OnSlotAdded(UPanelSlot* InSlot) override;
+	virtual void OnSlotRemoved(UPanelSlot* InSlot) override;
 	// End UPanelWidget
 
 	// INavigableWidgetInterface

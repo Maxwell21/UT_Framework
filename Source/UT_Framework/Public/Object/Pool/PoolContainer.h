@@ -75,7 +75,7 @@ public:
 	TArray<FPoolData> Data;
 	
 	UPROPERTY(Category = "PoolContainer", BlueprintReadOnly)
-	TMap<FName, UPoolRuntimeData*> RuntimeData;
+	TMap<FName, UPoolRuntimeData*> RuntimesData;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */

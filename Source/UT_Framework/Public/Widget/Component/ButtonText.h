@@ -7,6 +7,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/Button.h"
+#include "Misc/Attribute.h"
+#include "Layout/Margin.h"
+#include "Components/Widget.h"
+#include "Framework/Text/TextLayout.h"
 #include "ButtonText.generated.h"
 
 class STextBlock;

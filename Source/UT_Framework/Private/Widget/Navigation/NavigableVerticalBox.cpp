@@ -15,26 +15,26 @@ UNavigableVerticalBox::UNavigableVerticalBox(const FObjectInitializer& ObjectIni
 {
 }
 
-void UNavigableVerticalBox::OnSlotAdded(UPanelSlot* Slot)
+void UNavigableVerticalBox::OnSlotAdded(UPanelSlot* InSlot)
 {
-	if (UNavigableWidget* Widget = Cast<UNavigableWidget>(Slot->Content))
+	if (UNavigableWidget* Widget = Cast<UNavigableWidget>(InSlot->Content))
 	{
 		this->NavigableWidgets.Add(Widget);
 		Widget->OwnerContainer = this;
 	}
 
-	Super::OnSlotAdded(Slot);
+	Super::OnSlotAdded(InSlot);
 }
 
-void UNavigableVerticalBox::OnSlotRemoved(UPanelSlot* Slot)
+void UNavigableVerticalBox::OnSlotRemoved(UPanelSlot* InSlot)
 {
-	if (UNavigableWidget* Widget = Cast<UNavigableWidget>(Slot->Content))
+	if (UNavigableWidget* Widget = Cast<UNavigableWidget>(InSlot->Content))
 	{
 		this->NavigableWidgets.Remove(Widget);
 		Widget->OwnerContainer = nullptr;
 	}
 
-	Super::OnSlotRemoved(Slot);
+	Super::OnSlotRemoved(InSlot);
 }
 
 void UNavigableVerticalBox::BindInputs()

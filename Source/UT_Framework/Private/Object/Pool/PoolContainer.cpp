@@ -14,11 +14,11 @@ void UPoolContainer::Init()
 	{
 		if (CurrentData.Actor && CurrentData.Key.IsValid() && CurrentData.Number > 0)
 		{
-			UPoolRuntimeData* RuntimeData = this->CreatePoolRuntimeData(CurrentData.Actor);
+			UPoolRuntimeData* TempData = this->CreatePoolRuntimeData(CurrentData.Actor);
 			int32 Number = CurrentData.Number - 1;
-			this->AddNext(CurrentData.Actor, RuntimeData, Number);
+			this->AddNext(CurrentData.Actor, TempData, Number);
 
-			this->RuntimeData.Add(CurrentData.Key, RuntimeData);
+			this->RuntimesData.Add(CurrentData.Key, TempData);
 		}
 	}
 }
@@ -63,7 +63,7 @@ void UPoolContainer::AddNext(TSubclassOf<AActor> ActorClass, UPoolRuntimeData* P
 
 AActor* UPoolContainer::GetByKey(FName Key)
 {
-	UPoolRuntimeData* RuntimeData = *this->RuntimeData.Find(Key);
+	UPoolRuntimeData* RuntimeData = *this->RuntimesData.Find(Key);
 	if (RuntimeData)
 	{
 		AActor* Actor =	this->GetValidRuntimePoolData(RuntimeData);
