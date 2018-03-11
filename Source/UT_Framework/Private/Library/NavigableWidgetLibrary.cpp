@@ -9,19 +9,45 @@
 #include "NavigableWidgetInterface.h"
 #include "UObjectIterator.h"
 
-void UNavigableWidgetLibrary::SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container)
+void UNavigableWidgetLibrary::SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container, bool PreserveForCancel /*= false*/)
 {
 	if (!Container || !Container->ContainNavigableWidget())
 		return;
 
-	// unfocus all + unbind 
-	if (INavigableWidgetInterface* NavigableInterface = (INavigableWidgetInterface*)(UNavigableWidgetLibrary::GetActiveNavigableContainer().GetInterface()))
-		NavigableInterface->Shutdown();
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(UNavigableWidgetLibrary::GetActiveNavigableContainer().GetInterface());
+	TScriptInterface<INavigableWidgetInterface> CurrentContainerInterface = UNavigableWidgetLibrary::GetActiveNavigableContainer();
 
-	// Focus first
+	/**
+	 * if we are not preserving the current container
+	 */
+	if (PreserveForCancel == false)
+	{
+		// unfocus all + unbind 
+		if (CurrentContainer)
+			CurrentContainer->Shutdown();
+	}
+
+	// Prepare new container
 	Container->Initialize();
 	Container->IsActive = true;
-	UNavigableWidgetLibrary::FocusNavigableWidget(Container, Container->GetFirstNavigableWidget());
+
+	// Set the current container has parent of the new one
+	if (PreserveForCancel && CurrentContainer)
+	{
+		// remove active flag to the preserved container
+		CurrentContainer->IsActive = false;
+		Container->Parent = CurrentContainerInterface;
+	}
+
+	/**
+	 * Get widget to focus (in case of the container is a preserved container we get the last focused widget as new widget to focus
+	 */
+	UNavigableWidget* WidgetToFocus = (Container->GetFocusedNavigationWidget())
+		? Container->GetFocusedNavigationWidget()
+		: Container->GetFirstNavigableWidget()
+	;
+
+	UNavigableWidgetLibrary::FocusNavigableWidget(Container, WidgetToFocus);
 }
 
 TScriptInterface<INavigableWidgetInterface> UNavigableWidgetLibrary::GetActiveNavigableContainer()
