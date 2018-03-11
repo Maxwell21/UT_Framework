@@ -55,7 +55,7 @@ void UNavigableVerticalBox::BindInputs()
 				for (int32 AxisIndex = Results.Num() - 1; AxisIndex >= 0; --AxisIndex)
 				{
 					FInputActionKeyMapping KeyMapping = FInputActionKeyMapping(Results[AxisIndex].AxisName, Results[AxisIndex].Key);
-					this->NavigateNextKeys.Add(KeyMapping);
+					this->NavigateNextKeys.AddUnique(KeyMapping);
 				}
 			}
 
@@ -69,7 +69,7 @@ void UNavigableVerticalBox::BindInputs()
 				for (int32 AxisIndex = Results.Num() - 1; AxisIndex >= 0; --AxisIndex)
 				{
 					FInputActionKeyMapping KeyMapping = FInputActionKeyMapping(Results[AxisIndex].AxisName, Results[AxisIndex].Key);
-					this->NavigatePreviousKeys.Add(KeyMapping);
+					this->NavigatePreviousKeys.AddUnique(KeyMapping);
 				}
 			}
 
@@ -82,7 +82,7 @@ void UNavigableVerticalBox::BindInputs()
 				/** Loop and add procedurally them to the "ConfirmKeys" array */
 				for (int32 ActionIndex = Results.Num() - 1; ActionIndex >= 0; --ActionIndex)
 				{
-					this->ConfirmKeys.Add(Results[ActionIndex]);
+					this->ConfirmKeys.AddUnique(Results[ActionIndex]);
 				}
 			}
 
@@ -95,7 +95,7 @@ void UNavigableVerticalBox::BindInputs()
 				/** Loop and add procedurally them to the "CancelKeys" array */
 				for (int32 ActionIndex = Results.Num() - 1; ActionIndex >= 0; --ActionIndex)
 				{
-					this->CancelKeys.Add(Results[ActionIndex]);
+					this->CancelKeys.AddUnique(Results[ActionIndex]);
 				}
 			}
  		}
