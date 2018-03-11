@@ -6,6 +6,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
+#include "UObject/Object.h"
 #include "GameFramework/PlayerInput.h"
 #include "Components/VerticalBox.h"
 #include "NavigableWidgetInterface.h"
@@ -20,7 +22,7 @@ class UNavigableWidget;
 * * Many Children
 * * Flows Vertical
 */
-UCLASS()
+UCLASS(AutoExpandCategories = ("Umbra Framework | Navigation"))
 class UT_FRAMEWORK_API UNavigableVerticalBox : public UVerticalBox, public INavigableWidgetInterface
 {
 	GENERATED_UCLASS_BODY()
@@ -32,10 +34,22 @@ public:
 	/************************************************************************/
 
 	/**
+	* Axis used for going to the next widget available
+	*/
+	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
+	TArray<FName> NavigateNextAxis;
+
+	/**
 	 * Keys used for going to the next widget available
 	 */
 	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
 	TArray<FInputActionKeyMapping> NavigateNextKeys;
+
+	/**
+	* Axis used for going to the previous widget available
+	*/
+	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
+	TArray<FName> NavigatePreviousAxis;
 
 	/**
 	* Keys used for going to the previous widget available
@@ -44,10 +58,28 @@ public:
 	TArray<FInputActionKeyMapping> NavigatePreviousKeys;
 
 	/**
+	* Actions used for call event when is focused
+	*/
+	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
+	TArray<FName> ConfirmActions;
+
+	/**
 	* Keys used for call event when is focused
 	*/
 	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
-	TArray<FInputActionKeyMapping> Confirmkeys;
+	TArray<FInputActionKeyMapping> ConfirmKeys;
+
+	/**
+	* Actions used for call event when player cancel 
+	*/
+	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
+	TArray<FName> CancelActions;
+
+	/**
+	* Keys used for call event when player cancel
+	*/
+	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
+	TArray<FInputActionKeyMapping> CancelKeys;
 
 	/**
 	* When it's first or last widget if true the next focusable widget will be the opposite
@@ -83,6 +115,7 @@ protected:
 	virtual void HandleNextKeyPressed();
 	virtual void HandlePreviousKeyPressed();
 	virtual void HandleConfirmKeyPressed();
+	virtual void HandleCancelKeyPressed();
 	virtual void UnFocusAllNavigableWidget();
 
 #if WITH_EDITOR

@@ -30,9 +30,10 @@ public:
 	* Used for changing navigable container
 	*
 	* @param INavigableWidgetInterface Container
+	* @param bool PreserveForCancel
 	*/
 	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
-	static void SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container);
+	static void SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container, bool PreserveForCancel = false);
 
 	/**
 	* Used for changing navigable container

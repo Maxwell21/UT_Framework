@@ -11,6 +11,8 @@
 
 void INavigableWidgetInterface::Initialize()
 {
+	// force unbind in case of that container has been preserved
+	this->UnBindInputs();
 	this->InitializeInputComponent();
 	this->BindInputs();
 	this->Initialized = true;
@@ -21,6 +23,7 @@ void INavigableWidgetInterface::Shutdown()
 	this->UnBindInputs();
 	this->UnFocusAllNavigableWidget();
 	this->Initialized = false;
+	this->IsActive = false;
 }
 
 void INavigableWidgetInterface::InitializeInputComponent()

@@ -7,6 +7,7 @@
 #include "NavigableWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavigableWidgetLibrary.h"
+#include "GameFramework/PlayerController.h"
 
 #define LOCTEXT_NAMESPACE "UmbraFramework"
 
@@ -41,6 +42,64 @@ void UNavigableVerticalBox::BindInputs()
 {
 	if (this->InputComponent)
 	{
+		UPlayerInput* PlayerInput = GetOwningPlayerController()->PlayerInput;
+		if (PlayerInput)
+		{
+			/** Prepare next axis */
+			for (const FName AxisName : this->NavigateNextAxis)
+			{
+				/** Gather all next axis mapping */
+				TArray<FInputAxisKeyMapping> Results = PlayerInput->GetKeysForAxis(AxisName);
+
+				/** Loop and add procedurally them to the "NavigateNextKeys" array */
+				for (int32 AxisIndex = Results.Num() - 1; AxisIndex >= 0; --AxisIndex)
+				{
+					FInputActionKeyMapping KeyMapping = FInputActionKeyMapping(Results[AxisIndex].AxisName, Results[AxisIndex].Key);
+					this->NavigateNextKeys.Add(KeyMapping);
+				}
+			}
+
+			/** Prepare previous axis */
+			for (const FName AxisName : this->NavigatePreviousAxis)
+			{
+				/** Gather all previous axis mapping */
+				TArray<FInputAxisKeyMapping> Results = PlayerInput->GetKeysForAxis(AxisName);
+
+				/** Loop and add procedurally them to the "NavigatePreviousKeys" array */
+				for (int32 AxisIndex = Results.Num() - 1; AxisIndex >= 0; --AxisIndex)
+				{
+					FInputActionKeyMapping KeyMapping = FInputActionKeyMapping(Results[AxisIndex].AxisName, Results[AxisIndex].Key);
+					this->NavigatePreviousKeys.Add(KeyMapping);
+				}
+			}
+
+			/** Prepare confirm action */
+			for (const FName ActionName : this->ConfirmActions)
+			{
+				/** Gather all previous axis mapping */
+				TArray<FInputActionKeyMapping> Results = PlayerInput->GetKeysForAction(ActionName);
+
+				/** Loop and add procedurally them to the "ConfirmKeys" array */
+				for (int32 ActionIndex = Results.Num() - 1; ActionIndex >= 0; --ActionIndex)
+				{
+					this->ConfirmKeys.Add(Results[ActionIndex]);
+				}
+			}
+
+			/** Prepare cancel action */
+			for (const FName ActionName : this->CancelActions)
+			{
+				/** Gather all previous axis mapping */
+				TArray<FInputActionKeyMapping> Results = PlayerInput->GetKeysForAction(ActionName);
+
+				/** Loop and add procedurally them to the "CancelKeys" array */
+				for (int32 ActionIndex = Results.Num() - 1; ActionIndex >= 0; --ActionIndex)
+				{
+					this->CancelKeys.Add(Results[ActionIndex]);
+				}
+			}
+ 		}
+
 		for (FInputActionKeyMapping KeyMapping : this->NavigateNextKeys)
 		{
 			this->InputComponent->BindKey(KeyMapping.Key, EInputEvent::IE_Pressed, this, &UNavigableVerticalBox::HandleNextKeyPressed);
@@ -53,9 +112,14 @@ void UNavigableVerticalBox::BindInputs()
 			this->InputComponent->BindKey(KeyMapping.Key, EInputEvent::IE_Repeat, this, &UNavigableVerticalBox::HandlePreviousKeyPressed);
 		}
 
-		for (FInputActionKeyMapping KeyMapping : this->Confirmkeys)
+		for (FInputActionKeyMapping KeyMapping : this->ConfirmKeys)
 		{
 			this->InputComponent->BindKey(KeyMapping.Key, EInputEvent::IE_Pressed, this, &UNavigableVerticalBox::HandleConfirmKeyPressed);
+		}
+
+		for (FInputActionKeyMapping KeyMapping : this->CancelKeys)
+		{
+			this->InputComponent->BindKey(KeyMapping.Key, EInputEvent::IE_Pressed, this, &UNavigableVerticalBox::HandleCancelKeyPressed);
 		}
 	}
 }
@@ -63,7 +127,11 @@ void UNavigableVerticalBox::BindInputs()
 void UNavigableVerticalBox::UnBindInputs()
 {
 	if (this->InputComponent)
+	{
+		this->HasConfirmed = false;
 		this->InputComponent->DestroyComponent();
+		this->InputComponent = nullptr;
+	}
 }
 
 UNavigableWidget* UNavigableVerticalBox::GetFocusedNavigationWidget()
@@ -134,6 +202,15 @@ void UNavigableVerticalBox::HandleConfirmKeyPressed()
 	{
 		this->HasConfirmed = true;
 		this->GetFocusedNavigationWidget()->ConfirmState();
+	}
+}
+
+void UNavigableVerticalBox::HandleCancelKeyPressed()
+{
+	if (this->GetFocusedNavigationWidget())
+	{
+		this->GetFocusedNavigationWidget()->CancelState();
+		UNavigableWidgetLibrary::SwitchNavigableContainer(this->Parent, false);
 	}
 }
 
