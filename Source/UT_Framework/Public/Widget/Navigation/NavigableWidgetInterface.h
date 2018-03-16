@@ -63,4 +63,5 @@ public:
 
 	virtual bool ContainNavigableWidget() = 0;
 
+	virtual void InvalidateConfirm() = 0;
 };

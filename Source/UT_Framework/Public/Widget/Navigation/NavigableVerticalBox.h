@@ -110,6 +110,7 @@ protected:
 	virtual UNavigableWidget* GetFirstNavigableWidget() override;
 	virtual APlayerController* GetOwningPlayerController() override;
 	virtual bool ContainNavigableWidget() override;
+	virtual void InvalidateConfirm() override;
 	// End INavigableWidgetInterface
 
 	virtual void HandleNextKeyPressed();
