@@ -160,6 +160,11 @@ bool UNavigableVerticalBox::ContainNavigableWidget()
 	return this->NavigableWidgets.Num() > 0;
 }
 
+void UNavigableVerticalBox::InvalidateConfirm()
+{
+	this->HasConfirmed = false;
+}
+
 void UNavigableVerticalBox::HandleNextKeyPressed()
 {
 	if (this->HasConfirmed)

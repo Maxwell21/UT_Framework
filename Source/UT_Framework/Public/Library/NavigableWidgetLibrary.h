@@ -68,4 +68,13 @@ public:
 	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
 	static UNavigableWidget* GetFocusedNavigableWidget(TScriptInterface<INavigableWidgetInterface> Container);
 
+	/**
+	* Force a container which has confirm to invalidate confirm
+	*
+	* @param INavigableWidgetInterface Container
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static void InvalidateConfirmState(TScriptInterface<INavigableWidgetInterface> Container);
+
+
 };

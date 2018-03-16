@@ -102,3 +102,9 @@ UNavigableWidget* UNavigableWidgetLibrary::GetFocusedNavigableWidget(TScriptInte
 
 	return nullptr;
 }
+
+void UNavigableWidgetLibrary::InvalidateConfirmState(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	if (Container)
+		Container->InvalidateConfirm();
+}
