@@ -69,6 +69,22 @@ public:
 	static UNavigableWidget* GetFocusedNavigableWidget(TScriptInterface<INavigableWidgetInterface> Container);
 
 	/**
+	* Disable inputs for the current container
+	*
+	* @return bool
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static bool DisableInput(TScriptInterface<INavigableWidgetInterface> Container);
+
+	/**
+	* Enable inputs for the current container
+	*
+	* @return bool
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static bool EnableInput(TScriptInterface<INavigableWidgetInterface> Container);
+
+	/**
 	* Force a container which has confirm to invalidate confirm
 	*
 	* @param INavigableWidgetInterface Container

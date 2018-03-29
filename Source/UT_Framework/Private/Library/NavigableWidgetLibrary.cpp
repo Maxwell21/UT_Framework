@@ -103,6 +103,37 @@ UNavigableWidget* UNavigableWidgetLibrary::GetFocusedNavigableWidget(TScriptInte
 	return nullptr;
 }
 
+bool UNavigableWidgetLibrary::DisableInput(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(Container.GetInterface());
+
+	if (CurrentContainer)
+	{
+		if (CurrentContainer->Parent)
+			DisableInput(CurrentContainer->Parent);
+
+		CurrentContainer->Shutdown();
+
+		return true;
+	}
+
+	return false;
+}
+
+bool UNavigableWidgetLibrary::EnableInput(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(Container.GetInterface());
+
+	if (CurrentContainer)
+	{
+		SwitchNavigableContainer(Container);
+
+		return true;
+	}
+
+	return false;
+}
+
 void UNavigableWidgetLibrary::InvalidateConfirmState(TScriptInterface<INavigableWidgetInterface> Container)
 {
 	if (Container)
