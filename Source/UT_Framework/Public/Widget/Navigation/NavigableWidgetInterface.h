@@ -13,7 +13,7 @@ class UInputComponent;
 class APlayerController;
 
 UINTERFACE(Blueprintable)
-class UNavigableWidgetInterface : public UInterface
+class UT_FRAMEWORK_API UNavigableWidgetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
