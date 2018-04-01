@@ -52,6 +52,10 @@ public class UT_FrameworkEditor : ModuleRules
                 "Projects",
                 "LevelEditor",
                 "KismetCompiler",
+                "Paper2D",
+                "Sequencer",
+                "MovieScene",
+                "MovieSceneTools",
                 "UT_Framework",
 				// ... add private dependencies that you statically link with here ...	
 			}
