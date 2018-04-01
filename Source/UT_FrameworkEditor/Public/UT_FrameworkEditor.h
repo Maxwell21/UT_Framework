@@ -31,6 +31,8 @@ protected:
 	TSharedPtr<FStateMachineGraphFactory> StateMachineGraphFactory;
 	TSharedPtr<FStateMachineGraphPinConnectionFactory> StateMachineGraphPinConnectionFactory;
 
+	FDelegateHandle FlipbookTrackCreateEditorHandle;
+
 public:
 
 	/************************************************************************/
