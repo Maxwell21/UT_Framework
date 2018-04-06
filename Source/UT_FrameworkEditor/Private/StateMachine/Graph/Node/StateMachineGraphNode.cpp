@@ -45,8 +45,8 @@ void UStateMachineGraphNode::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin = CreatePin(EGPD_Input, TEXT("State"), FString(), nullptr, TEXT(""));
-	OutputPin = CreatePin(EGPD_Output, TEXT("State"), FString(), nullptr, TEXT(""));
+	InputPin = CreatePin(EGPD_Input, TEXT("State"), FName(), nullptr, TEXT(""));
+	OutputPin = CreatePin(EGPD_Output, TEXT("State"), FName(), nullptr, TEXT(""));
 }
 
 bool UStateMachineGraphNode::CanCreateUnderSpecifiedSchema(const UEdGraphSchema* Schema) const

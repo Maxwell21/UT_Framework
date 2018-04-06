@@ -131,27 +131,29 @@ FText UMovieSceneFlipbookAnimationTrack::GetDefaultDisplayName() const
 
 #endif
 
-TInlineValue<FMovieSceneSegmentCompilerRules> UMovieSceneFlipbookAnimationTrack::GetRowCompilerRules() const
+FMovieSceneTrackRowSegmentBlenderPtr UMovieSceneFlipbookAnimationTrack::GetRowSegmentBlender() const
 {
 	// Apply an upper bound exclusive blend
-	struct FSkeletalAnimationRowCompilerRules : FMovieSceneSegmentCompilerRules
+	struct FFlipbookAnimationRowCompilerRules : FMovieSceneTrackRowSegmentBlender
 	{
 		bool bUseLegacySectionIndexBlend;
-		FSkeletalAnimationRowCompilerRules(bool bInUseLegacySectionIndexBlend) : bUseLegacySectionIndexBlend(bInUseLegacySectionIndexBlend) {}
+		FFlipbookAnimationRowCompilerRules(bool bInUseLegacySectionIndexBlend) : bUseLegacySectionIndexBlend(bInUseLegacySectionIndexBlend) {}
 
-		virtual void BlendSegment(FMovieSceneSegment& Segment, const TArrayView<const FMovieSceneSectionData>& SourceData) const
+		virtual void Blend(FSegmentBlendData& BlendData) const override
 		{
 			// Run the default high pass filter for overlap priority
-			MovieSceneSegmentCompiler::BlendSegmentHighPass(Segment, SourceData);
+			MovieSceneSegmentCompiler::FilterOutUnderlappingSections(BlendData);
 
 			if (bUseLegacySectionIndexBlend)
 			{
 				// Weed out based on array index (legacy behaviour)
-				MovieSceneSegmentCompiler::BlendSegmentLegacySectionOrder(Segment, SourceData);
+				MovieSceneSegmentCompiler::BlendSegmentLegacySectionOrder(BlendData);
 			}
 		}
+
 	};
-	return FSkeletalAnimationRowCompilerRules(bUseLegacySectionIndexBlend);
+
+	return FFlipbookAnimationRowCompilerRules(bUseLegacySectionIndexBlend);
 }
 
 #undef LOCTEXT_NAMESPACE

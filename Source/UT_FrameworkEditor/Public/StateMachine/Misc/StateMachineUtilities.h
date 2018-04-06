@@ -228,7 +228,7 @@ public:
 						FEdGraphPinType PinType;
 						PinType.bIsReference = false;
 						PinType.PinCategory = K2Schema->PC_Boolean;
-						const FString NewPinName = ResultNode->CreateUniquePinName(TEXT("Result"));
+						FName NewPinName = ResultNode->CreateUniquePinName(TEXT("Result"));
 						UEdGraphPin* NewPin = ResultNode->CreateUserDefinedPin(NewPinName, PinType, EGPD_Input, false);
 					
 						ResultNode->ReconstructNode();

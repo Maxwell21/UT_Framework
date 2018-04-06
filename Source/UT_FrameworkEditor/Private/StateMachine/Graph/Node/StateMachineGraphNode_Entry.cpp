@@ -30,7 +30,7 @@ void UStateMachineGraphNode_Entry::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	OutputPin = CreatePin(EGPD_Output, TEXT("Entry"), FString(), nullptr, TEXT(""));
+	OutputPin = CreatePin(EGPD_Output, TEXT("Entry"), FName(), nullptr, TEXT(""));
 }
 
 void UStateMachineGraphNode_Entry::CreateBoundGraph()

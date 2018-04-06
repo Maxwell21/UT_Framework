@@ -31,7 +31,7 @@ void UNpcBehaviorGraphNode_Restart::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin  = CreatePin(EGPD_Input, TEXT("Restart"), FString(), nullptr, TEXT(""));
+	InputPin  = CreatePin(EGPD_Input, TEXT("Restart"), FName(), nullptr, TEXT(""));
 }
 
 FLinearColor UNpcBehaviorGraphNode_Restart::GetNodeTitleColor() const
