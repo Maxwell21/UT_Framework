@@ -52,9 +52,9 @@ FText UStateMachineGraphNode_Transition::GetNodeTitle(ENodeTitleType::Type Title
 
 void UStateMachineGraphNode_Transition::AllocateDefaultPins()
 {
-	InputPin = CreatePin(EGPD_Input, TEXT("Transition"), FString(), nullptr, TEXT(""));
+	InputPin = CreatePin(EGPD_Input, TEXT("Transition"), FName(), nullptr, TEXT(""));
 	InputPin->bHidden = true;
-	OutputPin = CreatePin(EGPD_Output, TEXT("Transition"), FString(), nullptr, TEXT(""));
+	OutputPin = CreatePin(EGPD_Output, TEXT("Transition"), FName(), nullptr, TEXT(""));
 	OutputPin->bHidden = true;
 }
 

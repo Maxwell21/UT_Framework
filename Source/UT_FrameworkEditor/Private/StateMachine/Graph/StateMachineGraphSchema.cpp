@@ -62,7 +62,7 @@ void UStateMachineGraphSchema::GetBreakLinkToSubMenuActions(class FMenuBuilder& 
 		FText Title = FText::FromString(TitleString);
 		if (Pin->PinName != TEXT(""))
 		{
-			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName);
+			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName.ToString());
 
 			// Add name of connection if possible
 			FFormatNamedArguments Args;
@@ -318,7 +318,7 @@ void UStateMachineGraphSchema::BreakPinLinks(UEdGraphPin& TargetPin, bool bSends
 	UEdGraphSchema::BreakPinLinks(TargetPin, bSendsNodeNotifcation);
 }
 
-void UStateMachineGraphSchema::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin)
+void UStateMachineGraphSchema::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin) const
 {
 	const FScopedTransaction Transaction(NSLOCTEXT("UnrealEd", "GraphEd_BreakSinglePinLink", "Break Pin Link"));
 

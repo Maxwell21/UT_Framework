@@ -23,8 +23,8 @@ void UNpcBehaviorGraphNode_MoveTo::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin  = CreatePin(EGPD_Input, TEXT("MoveTo"), FString(), nullptr, TEXT(""));
-	OutputPin = CreatePin(EGPD_Output, TEXT("MoveTo"), FString(), nullptr, TEXT(""));
+	InputPin  = CreatePin(EGPD_Input, TEXT("MoveTo"), FName(), nullptr, TEXT(""));
+	OutputPin = CreatePin(EGPD_Output, TEXT("MoveTo"), FName(), nullptr, TEXT(""));
 }
 
 FLinearColor UNpcBehaviorGraphNode_MoveTo::GetNodeTitleColor() const

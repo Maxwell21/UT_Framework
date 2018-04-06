@@ -22,7 +22,7 @@ void UNpcBehaviorGraphNode_Multiple::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin  = CreatePin(EGPD_Input, TEXT("Multiple"), FString(), nullptr, TEXT(""));
+	InputPin  = CreatePin(EGPD_Input, TEXT("Multiple"), FName(), nullptr, TEXT(""));
 }
 
 FLinearColor UNpcBehaviorGraphNode_Multiple::GetNodeTitleColor() const

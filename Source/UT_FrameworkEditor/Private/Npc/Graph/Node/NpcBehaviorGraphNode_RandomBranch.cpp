@@ -33,7 +33,7 @@ void UNpcBehaviorGraphNode_RandomBranch::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin  = CreatePin(EGPD_Input, TEXT("RandomBranch"), FString(), nullptr, TEXT(""));
+	InputPin  = CreatePin(EGPD_Input, TEXT("RandomBranch"), FName(), nullptr, TEXT(""));
 }
 
 FLinearColor UNpcBehaviorGraphNode_RandomBranch::GetNodeTitleColor() const
@@ -51,7 +51,7 @@ void UNpcBehaviorGraphNode_RandomBranch::RefreshAllOutputPins()
 		{
 			if (RandomBranchTask->MultipleTargets.IsValidIndex(Index) == false)
 			{
-				UEdGraphPin* NewPin = CreatePin(EGPD_Output, TEXT("RandomBranch"), FString(), nullptr, TEXT(""));
+				UEdGraphPin* NewPin = CreatePin(EGPD_Output, TEXT("RandomBranch"), FName(), nullptr, TEXT(""));
 				this->MultipleOutputPins.AddUnique(NewPin);
 
 				FNpcBehaviorTask_MultipleTarget Target;
