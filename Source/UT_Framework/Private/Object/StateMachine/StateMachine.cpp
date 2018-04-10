@@ -107,7 +107,7 @@ void UStateMachine::Start()
 	{
  		if (this->GetRootState().IsValid())
 		{
-			this->OnStartMachineStart();
+			this->OnStateMachineStart();
 			this->SetCurrentState(this->GetRootState());
 			this->BeginState();
 		}

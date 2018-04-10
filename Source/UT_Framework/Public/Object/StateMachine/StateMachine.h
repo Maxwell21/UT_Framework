@@ -306,6 +306,6 @@ protected:
 public:
 
 	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintImplementableEvent)
-	void OnStartMachineStart();
+	void OnStateMachineStart();
 	
 };
