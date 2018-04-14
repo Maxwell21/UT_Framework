@@ -47,7 +47,7 @@ void FGDC_StateMachine::DrawData(APlayerController* OwnerPC, FGameplayDebuggerCa
 	//DISPLAY ALL ACTIVE STATE MACHINE
 	CanvasContext.Printf(TEXT("{red}STATE MACHINE : "));
 	CanvasContext.Printf(TEXT("{red}------------------"));
-	CanvasContext.Printf(*FString::Printf(TEXT("{gray}Owner: {green}%s"), *DataPack.OwnerName));
+	CanvasContext.Printf(TEXT("{gray}Owner: {green}%s"), *DataPack.OwnerName);
 	{
 		for (int32 Idx = 0; Idx < DataPack.StateMachinesDebug.Num(); Idx++)
 		{

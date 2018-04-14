@@ -22,8 +22,8 @@ void UNpcBehaviorGraphNode_Wait::AllocateDefaultPins()
 {
 	check(Pins.Num() == 0);
 
-	InputPin  = CreatePin(EGPD_Input, TEXT("Wait"), FString(), nullptr, TEXT(""));
-	OutputPin = CreatePin(EGPD_Output, TEXT("Wait"), FString(), nullptr, TEXT(""));
+	InputPin  = CreatePin(EGPD_Input, TEXT("Wait"), FName(), nullptr, TEXT(""));
+	OutputPin = CreatePin(EGPD_Output, TEXT("Wait"), FName(), nullptr, TEXT(""));
 }
 
 FLinearColor UNpcBehaviorGraphNode_Wait::GetNodeTitleColor() const

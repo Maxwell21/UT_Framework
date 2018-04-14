@@ -13,7 +13,7 @@ class UInputComponent;
 class APlayerController;
 
 UINTERFACE(Blueprintable)
-class UNavigableWidgetInterface : public UInterface
+class UT_FRAMEWORK_API UNavigableWidgetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -33,13 +33,19 @@ public:
 	
 	UInputComponent* InputComponent;
 
+	bool Initialized;
+
 	bool IsActive;
+
+	TScriptInterface<INavigableWidgetInterface> Parent;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
 	virtual void Initialize();
+
+	virtual void Shutdown();
 
 	virtual void InitializeInputComponent();
 
@@ -57,4 +63,5 @@ public:
 
 	virtual bool ContainNavigableWidget() = 0;
 
+	virtual void InvalidateConfirm() = 0;
 };

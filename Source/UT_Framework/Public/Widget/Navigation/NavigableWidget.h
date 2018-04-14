@@ -57,19 +57,25 @@ public:
 	/**
 	 * Call when this object is focused
 	 */
-	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintImplementableEvent)
+	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintCallable, BlueprintImplementableEvent)
 	void NormalState();
 
 	/**
 	* Call when this object is lose focus
 	*/
-	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintImplementableEvent)
+	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintCallable, BlueprintImplementableEvent)
 	void HoverState();	
 
 	/**
 	* Call when this object is focused and the user press confirm key
 	*/
-	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintImplementableEvent)
+	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintCallable, BlueprintImplementableEvent)
 	void ConfirmState();
+
+	/**
+	* Call when this object is focused and the user press cancel key
+	*/
+	UFUNCTION(Category = "Umbra Framework | Widgets | Navigation", BlueprintCallable, BlueprintImplementableEvent)
+	void CancelState();
 
 };

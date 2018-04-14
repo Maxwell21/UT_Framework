@@ -27,25 +27,20 @@ public:
 	/************************************************************************/
 
 	/**
-	 * Loop through all UNavigableWidgetInterface valid and tell them to initialize
-	 */
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
-	static void InitializeAllContainers();
+	* Used for changing navigable container
+	*
+	* @param INavigableWidgetInterface Container
+	* @param bool PreserveForCancel
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static void SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container, bool PreserveForCancel = false);
 
 	/**
 	* Used for changing navigable container
 	*
 	* @param INavigableWidgetInterface Container
 	*/
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
-	static void SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container);
-
-	/**
-	* Used for changing navigable container
-	*
-	* @param INavigableWidgetInterface Container
-	*/
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
 	static TScriptInterface<INavigableWidgetInterface> GetActiveNavigableContainer();
 
 	/**
@@ -54,13 +49,13 @@ public:
 	* @param INavigableWidgetInterface Container
 	* @param UNavigableWidget* NavigableWidget
 	*/
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
 	static void FocusNavigableWidget(TScriptInterface<INavigableWidgetInterface> Container, UNavigableWidget* NavigableWidget);
 
 	/**
 	* Used for unfocus all navigable widgets for all containers
 	*/
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
 	static void UnFocusAllNavigableWidget();
 	
 	/**
@@ -70,7 +65,32 @@ public:
 	*
 	* @return UNavigableWidget*
 	*/
-	UFUNCTION(Category = "Umbra Framework | Library", BlueprintCallable)
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
 	static UNavigableWidget* GetFocusedNavigableWidget(TScriptInterface<INavigableWidgetInterface> Container);
+
+	/**
+	* Disable inputs for the current container
+	*
+	* @return bool
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static bool DisableInput(TScriptInterface<INavigableWidgetInterface> Container);
+
+	/**
+	* Enable inputs for the current container
+	*
+	* @return bool
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static bool EnableInput(TScriptInterface<INavigableWidgetInterface> Container);
+
+	/**
+	* Force a container which has confirm to invalidate confirm
+	*
+	* @param INavigableWidgetInterface Container
+	*/
+	UFUNCTION(Category = "Umbra Framework | WidgetLibrary", BlueprintCallable)
+	static void InvalidateConfirmState(TScriptInterface<INavigableWidgetInterface> Container);
+
 
 };

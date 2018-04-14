@@ -26,6 +26,10 @@
 // Styles
 #include "FrameworkStyle.h"
 
+// Sequencer
+#include "ISequencerModule.h"
+#include "FlipbookAnimationTrackEditor.h"
+
 // AssetTools
 #include "IAssetTools.h"
 #include "IAssetTypeActions.h"
@@ -36,6 +40,7 @@
 // Debuggers
 #include "GameplayDebugger.h"
 #include "GDC_StateMachine.h"
+
 
 #define LOCTEXT_NAMESPACE "FUT_FrameworkEditorModule"
 
@@ -55,6 +60,10 @@ void FUT_FrameworkEditorModule::StartupModule()
 	FEdGraphUtilities::RegisterVisualNodeFactory(NpcBehaviorGraphFactory);
 	FEdGraphUtilities::RegisterVisualNodeFactory(StateMachineGraphFactory);
 	FEdGraphUtilities::RegisterVisualPinConnectionFactory(StateMachineGraphPinConnectionFactory);
+
+	// Sequencer
+	ISequencerModule& SequencerModule = FModuleManager::Get().LoadModuleChecked<ISequencerModule>("Sequencer");
+	FlipbookTrackCreateEditorHandle = SequencerModule.RegisterTrackEditor(FOnCreateTrackEditor::CreateStatic(&FFlipbookAnimationTrackEditor::CreateTrackEditor));
 
 	// Compilers
 	IKismetCompilerInterface& KismetCompilerModule = FModuleManager::LoadModuleChecked<IKismetCompilerInterface>("KismetCompiler");
@@ -88,6 +97,14 @@ void FUT_FrameworkEditorModule::ShutdownModule()
 	FEdGraphUtilities::UnregisterVisualNodeFactory(NpcBehaviorGraphFactory);
 	FEdGraphUtilities::UnregisterVisualNodeFactory(StateMachineGraphFactory);
 	FEdGraphUtilities::UnregisterVisualPinConnectionFactory(StateMachineGraphPinConnectionFactory);
+
+	// Sequencer
+	if (FModuleManager::Get().IsModuleLoaded("Sequencer"))
+	{
+		ISequencerModule& SequencerModule = FModuleManager::Get().GetModuleChecked<ISequencerModule>("Sequencer");
+
+		SequencerModule.UnRegisterTrackEditor(FlipbookTrackCreateEditorHandle);
+	}
 
 	// Debuggers
 	#if WITH_GAMEPLAY_DEBUGGER

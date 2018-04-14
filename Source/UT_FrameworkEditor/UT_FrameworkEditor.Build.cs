@@ -52,6 +52,10 @@ public class UT_FrameworkEditor : ModuleRules
                 "Projects",
                 "LevelEditor",
                 "KismetCompiler",
+                "Paper2D",
+                "Sequencer",
+                "MovieScene",
+                "MovieSceneTools",
                 "UT_Framework",
 				// ... add private dependencies that you statically link with here ...	
 			}
@@ -60,11 +64,11 @@ public class UT_FrameworkEditor : ModuleRules
         if (Target.bBuildDeveloperTools || (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Configuration != UnrealTargetConfiguration.Test))
         {
             PrivateDependencyModuleNames.Add("GameplayDebugger");
-            Definitions.Add("WITH_GAMEPLAY_DEBUGGER=1");
+            PublicDefinitions.Add("WITH_GAMEPLAY_DEBUGGER=1");
         }
         else
         {
-            Definitions.Add("WITH_GAMEPLAY_DEBUGGER=0");
+            PublicDefinitions.Add("WITH_GAMEPLAY_DEBUGGER=0");
         }
 
         DynamicallyLoadedModuleNames.AddRange(

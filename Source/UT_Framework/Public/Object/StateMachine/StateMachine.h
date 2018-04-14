@@ -299,4 +299,13 @@ protected:
 	UFUNCTION()
 	virtual void FinishState();
 
+	/************************************************************************/
+	/* EVENTS                                                               */
+	/************************************************************************/
+
+public:
+
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintImplementableEvent)
+	void OnStateMachineStart();
+	
 };

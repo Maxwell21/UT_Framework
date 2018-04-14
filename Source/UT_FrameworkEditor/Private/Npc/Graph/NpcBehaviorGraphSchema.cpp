@@ -69,7 +69,7 @@ void UNpcBehaviorGraphSchema::GetBreakLinkToSubMenuActions(class FMenuBuilder& M
 		FText Title = FText::FromString(TitleString);
 		if (Pin->PinName != TEXT(""))
 		{
-			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName);
+			TitleString = FString::Printf(TEXT("%s (%s)"), *TitleString, *Pin->PinName.ToString());
 
 			// Add name of connection if possible
 			FFormatNamedArguments Args;
@@ -248,7 +248,7 @@ void UNpcBehaviorGraphSchema::BreakPinLinks(UEdGraphPin& TargetPin, bool bSendsN
 	UEdGraphSchema::BreakPinLinks(TargetPin, bSendsNodeNotifcation);
 }
 
-void UNpcBehaviorGraphSchema::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin)
+void UNpcBehaviorGraphSchema::BreakSinglePinLink(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin) const
 {
 	const FScopedTransaction Transaction(NSLOCTEXT("UnrealEd", "GraphEd_BreakSinglePinLink", "Break Pin Link"));
 	

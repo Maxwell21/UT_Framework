@@ -9,32 +9,45 @@
 #include "NavigableWidgetInterface.h"
 #include "UObjectIterator.h"
 
-void UNavigableWidgetLibrary::InitializeAllContainers()
-{
-	for (TObjectIterator<UObject> Itr; Itr; ++Itr)
-	{
-		UObject* Object = *Itr;
-		if (INavigableWidgetInterface* NavigableInterface = Cast<INavigableWidgetInterface>(Object))
-			NavigableInterface->Initialize();
-	}
-}
-
-void UNavigableWidgetLibrary::SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container)
+void UNavigableWidgetLibrary::SwitchNavigableContainer(TScriptInterface<INavigableWidgetInterface> Container, bool PreserveForCancel /*= false*/)
 {
 	if (!Container || !Container->ContainNavigableWidget())
 		return;
 
-	// unfocus all + unbind 
-	if (UNavigableWidgetLibrary::GetActiveNavigableContainer())
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(UNavigableWidgetLibrary::GetActiveNavigableContainer().GetInterface());
+	TScriptInterface<INavigableWidgetInterface> CurrentContainerInterface = UNavigableWidgetLibrary::GetActiveNavigableContainer();
+
+	/**
+	 * if we are not preserving the current container
+	 */
+	if (PreserveForCancel == false)
 	{
-		UNavigableWidgetLibrary::GetActiveNavigableContainer()->UnBindInputs();
-		UNavigableWidgetLibrary::GetActiveNavigableContainer()->UnFocusAllNavigableWidget();
+		// unfocus all + unbind 
+		if (CurrentContainer)
+			CurrentContainer->Shutdown();
 	}
 
-	// Focus first
-	Container->BindInputs();
+	// Prepare new container
+	Container->Initialize();
 	Container->IsActive = true;
-	UNavigableWidgetLibrary::FocusNavigableWidget(Container, Container->GetFirstNavigableWidget());
+
+	// Set the current container has parent of the new one
+	if (PreserveForCancel && CurrentContainer)
+	{
+		// remove active flag to the preserved container
+		CurrentContainer->IsActive = false;
+		Container->Parent = CurrentContainerInterface;
+	}
+
+	/**
+	 * Get widget to focus (in case of the container is a preserved container we get the last focused widget as new widget to focus
+	 */
+	UNavigableWidget* WidgetToFocus = (Container->GetFocusedNavigationWidget())
+		? Container->GetFocusedNavigationWidget()
+		: Container->GetFirstNavigableWidget()
+	;
+
+	UNavigableWidgetLibrary::FocusNavigableWidget(Container, WidgetToFocus);
 }
 
 TScriptInterface<INavigableWidgetInterface> UNavigableWidgetLibrary::GetActiveNavigableContainer()
@@ -88,4 +101,41 @@ UNavigableWidget* UNavigableWidgetLibrary::GetFocusedNavigableWidget(TScriptInte
 		return Container->GetFocusedNavigationWidget();
 
 	return nullptr;
+}
+
+bool UNavigableWidgetLibrary::DisableInput(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(Container.GetInterface());
+
+	if (CurrentContainer)
+	{
+		if (CurrentContainer->Parent)
+			DisableInput(CurrentContainer->Parent);
+
+		CurrentContainer->Shutdown();
+
+		return true;
+	}
+
+	return false;
+}
+
+bool UNavigableWidgetLibrary::EnableInput(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	INavigableWidgetInterface* CurrentContainer = (INavigableWidgetInterface*)(Container.GetInterface());
+
+	if (CurrentContainer)
+	{
+		SwitchNavigableContainer(Container);
+
+		return true;
+	}
+
+	return false;
+}
+
+void UNavigableWidgetLibrary::InvalidateConfirmState(TScriptInterface<INavigableWidgetInterface> Container)
+{
+	if (Container)
+		Container->InvalidateConfirm();
 }
