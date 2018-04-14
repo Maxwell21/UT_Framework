@@ -70,6 +70,7 @@ public:
 	virtual const FSlateBrush* GetShadowBrush(bool bSelected) const override;
 	void OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo);
 	bool OnVerifyNameTextChanged(const FText& InText, FText& OutErrorMessage);
+	virtual void GetNodeInfoPopups(FNodeInfoContext* Context, TArray<FGraphInformationPopupInfo>& Popups) const override;
 	// End of SGraphNode interface
 
 	virtual FSlateColor GetNodeColor() const;
@@ -78,4 +79,5 @@ public:
 	FText GetPreviewCornerText() const;
 	const FSlateBrush* GetNameIcon() const;
 	FSlateColor GetBorderBackgroundColor() const;
+
 };

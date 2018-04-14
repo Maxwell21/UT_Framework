@@ -17,7 +17,7 @@ class UStateMachineBlueprintGeneratedClass;
 class UWorld;
 
 USTRUCT(BlueprintType, Blueprintable)
-struct FTransition
+struct UT_FRAMEWORK_API FTransition
 {
 	GENERATED_BODY()
 
@@ -53,7 +53,7 @@ public:
 };
 
 USTRUCT(BlueprintType, Blueprintable)
-struct FState
+struct UT_FRAMEWORK_API FState
 {
 	GENERATED_BODY()
 

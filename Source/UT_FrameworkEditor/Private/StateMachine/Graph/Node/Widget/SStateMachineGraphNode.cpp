@@ -8,6 +8,8 @@
 #include "SStateMachineGraphNode_Transition.h"
 #include "StateMachineTransition_Default.h"
 #include "StateMachineUtilities.h"
+#include "StateMachineBlueprint.h"
+#include "StateMachine.h"
 #include "Widgets/SBoxPanel.h"
 #include "SImage.h"
 #include "SSpacer.h"
@@ -263,6 +265,32 @@ FSlateColor SStateMachineGraphNode::GetBorderBackgroundColor() const
 	FLinearColor InactiveStateColor(0.08f, 0.08f, 0.08f);
 
 	return InactiveStateColor;
+}
+
+void SStateMachineGraphNode::GetNodeInfoPopups(FNodeInfoContext* Context, TArray<FGraphInformationPopupInfo>& Popups) const
+{
+	UStateMachineBlueprint* StateMachineBlueprint = Cast<UStateMachineBlueprint>(Cast<UStateMachineGraph>(GraphNode->GetGraph())->StateMachineBlueprint);
+	UStateMachineGraphNode* StateMachineGraphNode = Cast<UStateMachineGraphNode>(GraphNode);
+
+	if (StateMachineGraphNode->GetRootNode() || !StateMachineGraphNode->State)
+		return; 
+
+	if (StateMachineBlueprint)
+	{
+		if (UStateMachine* StateMachine = Cast<UStateMachine>(StateMachineBlueprint->GetObjectBeingDebugged()))
+		{
+			if (StateMachine->CurrentState.IsValid())
+			{
+				FString StateName = StateMachine->CurrentState.Name;
+				if (StateName != StateMachineGraphNode->State->RuntimeData.Name)
+					return;
+
+				FLinearColor CurrentStateColor(1.f, 0.5f, 0.25f);
+				FString StateText = FString::Printf(TEXT("%s ACTIVE"), *StateName);
+				new (Popups) FGraphInformationPopupInfo(nullptr, CurrentStateColor, StateText);
+			}
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
