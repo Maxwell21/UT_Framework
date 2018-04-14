@@ -79,7 +79,7 @@ void UStateMachine::CheckTransitionForCurrentState()
 	if (!CurrentState.IsValid() || CurrentState.TransitionNames.Num() == 0)
 		return;
 
-	for (auto TransitionName : this->CurrentState.TransitionNames)
+	for (const auto& TransitionName : this->CurrentState.TransitionNames)
 	{
 		bool Result = false;
 		this->ExecuteInnerFunction(*TransitionName, &Result);
