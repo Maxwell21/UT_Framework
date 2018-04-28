@@ -31,7 +31,9 @@ protected:
 	{
 		struct FStateMachineDebug
 		{
+			FString StateMachineName;
 			FString CurrentState;
+			bool Paused;
 		};
 		FString OwnerName;
 		TArray<FStateMachineDebug> StateMachinesDebug;

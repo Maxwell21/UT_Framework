@@ -54,8 +54,7 @@ UStateMachine* UStateMachine::ConstructStateMachine(TSubclassOf<UStateMachine> T
 	if (!Template || !Owner)
 		return nullptr;
 
-	UStateMachine* StateMachine2 = DuplicateObject(Template->GetDefaultObject<UStateMachine>(), Owner);
-	if (UStateMachine* StateMachine = NewObject<UStateMachine>(Owner, Template))
+	if (UStateMachine* StateMachine = NewObject<UStateMachine>(Owner->GetWorld(), Template, NAME_None, RF_Standalone))
 	{
 		StateMachine->Init(Owner);
 
@@ -281,6 +280,23 @@ bool UStateMachine::RemoveTransitionByName(FString Name)
 	}
 
 	return false;
+}
+
+void UStateMachine::Pause()
+{
+	this->Paused = true;
+	this->UseTick = false;
+}
+
+void UStateMachine::UnPaused()
+{
+	this->Paused = false;
+	this->UseTick = true;
+}
+
+bool UStateMachine::IsPaused() const
+{
+	return Paused;
 }
 
 void UStateMachine::BeginState()
