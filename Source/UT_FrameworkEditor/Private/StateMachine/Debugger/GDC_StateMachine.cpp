@@ -33,7 +33,9 @@ void FGDC_StateMachine::CollectData(APlayerController* OwnerPC, AActor* DebugAct
 				if (Cast<AActor>(StateMachine->OwnerObject) && Cast<AActor>(StateMachine->OwnerObject) == DebugActor)
 				{
 					FRepData::FStateMachineDebug DebugData = FRepData::FStateMachineDebug();
+					DebugData.StateMachineName = StateMachine->GetName();
 					DebugData.CurrentState = StateMachine->CurrentState.Name;
+					DebugData.Paused = StateMachine->IsPaused();
 
 					DataPack.StateMachinesDebug.Add(DebugData);
 				}
@@ -53,6 +55,8 @@ void FGDC_StateMachine::DrawData(APlayerController* OwnerPC, FGameplayDebuggerCa
 		{
 			const FRepData::FStateMachineDebug& SmDebug = DataPack.StateMachinesDebug[Idx];
 			CanvasContext.Printf(TEXT("{gray}------------------"));
+			CanvasContext.Printf(TEXT("{gray}%s"), *SmDebug.StateMachineName);
+			CanvasContext.Printf(TEXT("{gray}%s"), (SmDebug.Paused) ? TEXT("PAUSE") : TEXT("ACTIVE"));
 			CanvasContext.Printf(TEXT("{gray}Current state : %s"), *SmDebug.CurrentState);
 			CanvasContext.Printf(TEXT("{gray}------------------"));
 		}

@@ -134,13 +134,13 @@ public:
 	UPROPERTY(Category = "State Machine", EditDefaultsOnly)
 	bool UseTick = true;
 
-	/** Delay between each check for all transitions for the current state */
-	UPROPERTY(Category = "State Machine", EditDefaultsOnly)
-	float TransitionCheckRate = 0.5f;
-
 	/** Delta time ticked */
 	UPROPERTY()
 	float Delta;
+
+	/** paused state machine*/
+	UPROPERTY()
+	bool Paused;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
@@ -272,6 +272,24 @@ public:
 	* @return bool
 	*/
 	bool RemoveTransitionByName(FString Name);
+
+	/**
+	* Paused state machine
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
+	virtual void Pause();
+
+	/**
+	* UnPaused state machine
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
+	virtual void UnPaused();
+
+	/**
+	 * @return bool - If paused or not
+	 */
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
+	virtual bool IsPaused() const;
 
 	/** FTickableGameObject */
 	virtual TStatId GetStatId() const override;
