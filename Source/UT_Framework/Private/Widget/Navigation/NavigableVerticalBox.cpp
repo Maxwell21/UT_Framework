@@ -175,12 +175,17 @@ void UNavigableVerticalBox::HandleNextKeyPressed()
 		if (this->NavigableWidgets[Index]->IsFocused && this->NavigableWidgets.IsValidIndex(Index + 1))
 		{
 			UNavigableWidgetLibrary::FocusNavigableWidget(this, this->NavigableWidgets[Index + 1]);
+			this->OnVerticalBoxChangedChild.Broadcast(Index + 1);
+
 			return;
 		}
 	}
 
 	if (this->BoundOpposite)
+	{
 		UNavigableWidgetLibrary::FocusNavigableWidget(this, this->NavigableWidgets[0]);
+		this->OnVerticalBoxChangedChild.Broadcast(0);
+	}
 }
 
 void UNavigableVerticalBox::HandlePreviousKeyPressed()
@@ -193,12 +198,17 @@ void UNavigableVerticalBox::HandlePreviousKeyPressed()
 		if (this->NavigableWidgets[Index]->IsFocused && this->NavigableWidgets.IsValidIndex(Index - 1))
 		{
 			UNavigableWidgetLibrary::FocusNavigableWidget(this, this->NavigableWidgets[Index -1]);
+			this->OnVerticalBoxChangedChild.Broadcast(Index - 1);
+
 			return;
 		}
 	}
 
 	if (this->BoundOpposite)
+	{
 		UNavigableWidgetLibrary::FocusNavigableWidget(this, this->NavigableWidgets[this->NavigableWidgets.Num() - 1]);
+		this->OnVerticalBoxChangedChild.Broadcast(this->NavigableWidgets.Num() - 1);
+	}
 }
 
 void UNavigableVerticalBox::HandleConfirmKeyPressed()

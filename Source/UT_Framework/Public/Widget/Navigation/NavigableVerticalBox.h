@@ -15,6 +15,8 @@
 
 class UNavigableWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigableVerticalBoxChangedChild, int32, ChildIndex);
+
 /**
 * A navigable vertical box widget is a layout panel allowing child widgets to be automatically laid out
 * vertically and user can navigate through their navigable child widgets
@@ -87,10 +89,19 @@ public:
 	UPROPERTY(Category = "Umbra Framework | Navigation", EditAnywhere, BlueprintReadWrite)
 	bool BoundOpposite = true;
 
+	/**
+	 * All childs contain
+	 */
 	UPROPERTY()
 	TArray<UNavigableWidget*> NavigableWidgets;
 
+	/**
+	 * User has pressed the confirm button
+	 */
 	bool HasConfirmed = false;
+
+	UPROPERTY(Category = "Umbra Framework | Navigation", BlueprintAssignable)
+	FNavigableVerticalBoxChangedChild OnVerticalBoxChangedChild;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
