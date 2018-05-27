@@ -11,6 +11,9 @@ Features
 - State Machine (Create state machine system and start it from any object) [STABLE BUT NEED POLISH/REFACTO] ([GIF PREVIEW](https://image.ibb.co/dBXf37/SM_Overview.gif))
 ([VIDEO PREVIEW](https://www.youtube.com/watch?v=Be6-4IMY-fY))
 
+[SEQUENCER]
+- Flipbook support ([GIF PREVIEW](http://image.ibb.co/fme4H7/Seq_Flipbook_Overview.gif))
+
 [NPC]
 - Npc Behavior (Manipulate NPC through a custom node graph system) [WORK IN PROGRESS] [BRANCH => feature/npc-behavior]
 
