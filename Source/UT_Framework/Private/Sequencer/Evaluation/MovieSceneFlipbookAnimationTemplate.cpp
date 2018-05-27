@@ -12,7 +12,7 @@
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
 
-bool ShouldUsePreviewPlayback(IMovieScenePlayer& Player, UObject& RuntimeObject)
+bool ShouldUsePreviewFlipbookPlayback(IMovieScenePlayer& Player, UObject& RuntimeObject)
 {
 	// we also use PreviewSetAnimPosition in PIE when not playing, as we can preview in PIE
 	bool bIsNotInPIEOrNotPlaying = (RuntimeObject.GetWorld() && !RuntimeObject.GetWorld()->HasBegunPlay()) || Player.GetPlaybackStatus() != EMovieScenePlayerStatus::Playing;
@@ -24,7 +24,7 @@ bool CanPlayAnimation(UPaperFlipbookComponent* PaperFlipbookComponent, UPaperFli
 	return PaperFlipbookComponent && Flipbook;
 }
 
-void ResetAnimSequencerInstance(UObject& ObjectToRestore, IMovieScenePlayer& Player)
+void ResetFlipbookInstance(UObject& ObjectToRestore, IMovieScenePlayer& Player)
 {
 	//CastChecked<UPaperFlipbookComponent>(&ObjectToRestore)->Stop();
 }
@@ -88,7 +88,7 @@ struct FMinimalAnimParameters
 	FObjectKey Section;
 };
 
-namespace MovieScene
+namespace MovieSceneFlipbook
 {
 	struct FBlendedAnimation
 	{
@@ -132,7 +132,7 @@ namespace MovieScene
 			static FMovieSceneAnimTypeID AnimTypeID = TMovieSceneAnimTypeID<FComponentAnimationActuator>();
 			//OriginalStack.SavePreAnimatedState(Player, *PaperFlipbookComponent, AnimTypeID, FPreAnimatedAnimationTokenProducer());
 
-			const bool bPreviewPlayback = ShouldUsePreviewPlayback(Player, *PaperFlipbookComponent);
+			const bool bPreviewPlayback = ShouldUsePreviewFlipbookPlayback(Player, *PaperFlipbookComponent);
 
 			const EMovieScenePlayerStatus::Type PlayerStatus = Player.GetPlaybackStatus();
 
@@ -194,7 +194,7 @@ namespace MovieScene
 			{
 				FMovieSceneAnimTypeID AnimTypeID = SectionToAnimationIDs.GetAnimTypeID(Section);
 
-				Player.SavePreAnimatedState(*FlipbookInst, AnimTypeID, FStatelessPreAnimatedTokenProducer(&ResetAnimSequencerInstance));
+				Player.SavePreAnimatedState(*FlipbookInst, AnimTypeID, FStatelessPreAnimatedTokenProducer(&ResetFlipbookInstance));
 
 				// Set parameters
 				PaperFlipbookComponent->SetFlipbook(InFlipbook);
@@ -213,7 +213,7 @@ namespace MovieScene
 			{
 				// Unique anim type ID per slot
 				FMovieSceneAnimTypeID AnimTypeID = SectionToAnimationIDs.GetAnimTypeID(Section);
-				Player.SavePreAnimatedState(*FlipbookInst, AnimTypeID, FStatelessPreAnimatedTokenProducer(&ResetAnimSequencerInstance));
+				Player.SavePreAnimatedState(*FlipbookInst, AnimTypeID, FStatelessPreAnimatedTokenProducer(&ResetFlipbookInstance));
 
 				// Set parameters
 				PaperFlipbookComponent->SetFlipbook(InFlipbook);
@@ -228,7 +228,7 @@ namespace MovieScene
 
 }	// namespace MovieScene
 
-template<> FMovieSceneAnimTypeID GetBlendingDataType<MovieScene::FBlendedAnimation>()
+template<> FMovieSceneAnimTypeID GetBlendingDataType<MovieSceneFlipbook::FBlendedAnimation>()
 {
 	static FMovieSceneAnimTypeID TypeID = FMovieSceneAnimTypeID::Unique();
 	return TypeID;
@@ -251,15 +251,15 @@ void FMovieSceneFlipbookAnimationSectionTemplate::Evaluate(const FMovieSceneEval
 
 		// Ensure the accumulator knows how to actually apply component transforms
 
- 		FMovieSceneBlendingActuatorID ActuatorTypeID = MovieScene::FComponentAnimationActuator::GetActuatorTypeID();
+ 		FMovieSceneBlendingActuatorID ActuatorTypeID = MovieSceneFlipbook::FComponentAnimationActuator::GetActuatorTypeID();
  		FMovieSceneBlendingAccumulator& Accumulator = ExecutionTokens.GetBlendingAccumulator();
-		if (!Accumulator.FindActuator<MovieScene::FBlendedAnimation>(ActuatorTypeID))
-			Accumulator.DefineActuator(ActuatorTypeID, MakeShared<MovieScene::FComponentAnimationActuator>());
+		if (!Accumulator.FindActuator<MovieSceneFlipbook::FBlendedAnimation>(ActuatorTypeID))
+			Accumulator.DefineActuator(ActuatorTypeID, MakeShared<MovieSceneFlipbook::FComponentAnimationActuator>());
 
 		// Add the blendable to the accumulator
 		FMinimalAnimParameters AnimParams(Params.Animation, EvalTime, ExecutionTokens.GetCurrentScope(), GetSourceSection());
 		
-		ExecutionTokens.BlendToken(ActuatorTypeID, TBlendableToken<MovieScene::FBlendedAnimation>(AnimParams, BlendType.Get(), 1.f));
+		ExecutionTokens.BlendToken(ActuatorTypeID, TBlendableToken<MovieSceneFlipbook::FBlendedAnimation>(AnimParams, BlendType.Get(), 1.f));
 	}
 }
 
