@@ -20,7 +20,6 @@ class FFloatCurveKeyArea;
 class FMenuBuilder;
 class FSequencerSectionPainter;
 class UMovieSceneFlipbookAnimationSection;
-class USkeleton;
 
 /**
  * Tools for animation tracks
@@ -51,7 +50,6 @@ public:
 public:
 
 	// ISequencerTrackEditor interface
-
 	virtual void AddKey(const FGuid& ObjectGuid) override;
 	virtual void BuildObjectBindingTrackMenu(FMenuBuilder& MenuBuilder, const FGuid& ObjectBinding, const UClass* ObjectClass) override;
 	virtual bool HandleAssetAdded(UObject* Asset, const FGuid& TargetObjectGuid) override;
@@ -69,11 +67,11 @@ private:
 	/** Animation sub menu filter function */
 	bool ShouldFilterAsset(const FAssetData& AssetData);
 
-	/** Animation asset selected */
+	/** Animation asset selected  */
 	void OnAnimationAssetSelected(const FAssetData& AssetData, FGuid ObjectBinding, UMovieSceneTrack* Track);
 
 	/** Delegate for AnimatablePropertyChanged in AddKey */
-	FKeyPropertyResult AddKeyInternal(float KeyTime, UObject* Object, class UPaperFlipbook* AnimSequence, UMovieSceneTrack* Track);
+	FKeyPropertyResult AddKeyInternal(FFrameNumber KeyTime, UObject* Object, class UPaperFlipbook* AnimSequence, UMovieSceneTrack* Track, int32 RowIndex);
 
 };
 
@@ -87,7 +85,7 @@ class FFlipbookAnimationSection
 public:
 
 	/** Constructor. */
-	FFlipbookAnimationSection( UMovieSceneSection& InSection );
+	FFlipbookAnimationSection(UMovieSceneSection& InSection, TWeakPtr<ISequencer> InSequencer);
 
 	/** Virtual destructor. */
 	virtual ~FFlipbookAnimationSection() { }
@@ -97,24 +95,23 @@ public:
 	virtual UMovieSceneSection* GetSectionObject() override;
 	virtual FText GetSectionTitle() const override;
 	virtual float GetSectionHeight() const override;
-	virtual void GenerateSectionLayout( class ISectionLayoutBuilder& LayoutBuilder ) const override;
-	virtual int32 OnPaintSection( FSequencerSectionPainter& Painter ) const override;
+	virtual int32 OnPaintSection(FSequencerSectionPainter& Painter) const override;
 	virtual void BeginResizeSection() override;
-	virtual void ResizeSection(ESequencerSectionResizeMode ResizeMode, float ResizeTime) override;
+	virtual void ResizeSection(ESequencerSectionResizeMode ResizeMode, FFrameNumber ResizeFrameNumber) override;
 	virtual void BeginSlipSection() override;
-	virtual void SlipSection(float SlipTime) override;
+	virtual void SlipSection(double SlipTime) override;
 
 private:
 
 	/** The section we are visualizing */
 	UMovieSceneFlipbookAnimationSection& Section;
 
-	/** Weight key areas. */
-	mutable TSharedPtr<FFloatCurveKeyArea> WeightArea;
+	/** Used to draw animation frame, need selection state and local time*/
+	TWeakPtr<ISequencer> Sequencer;
 
 	/** Cached start offset value valid only during resize */
 	float InitialStartOffsetDuringResize;
 	
 	/** Cached start time valid only during resize */
-	float InitialStartTimeDuringResize;
+	FFrameNumber InitialStartTimeDuringResize;
 };

@@ -10,9 +10,7 @@
 #include "Toolkits/AssetEditorToolkit.h"
 #include "KismetCompilerModule.h"
 
-class UNpcBehaviorBlueprint;
 class UStateMachineBlueprint;
-class FNpcBehaviorGraphFactory;
 class FStateMachineGraphFactory;
 struct FStateMachineGraphPinConnectionFactory;
 
@@ -27,7 +25,6 @@ protected:
 
 	TSharedPtr<FExtensibilityManager> MenuExtensibilityManager;
 	TSharedPtr<FExtensibilityManager> ToolBarExtensibilityManager;
-	TSharedPtr<FNpcBehaviorGraphFactory> NpcBehaviorGraphFactory;
 	TSharedPtr<FStateMachineGraphFactory> StateMachineGraphFactory;
 	TSharedPtr<FStateMachineGraphPinConnectionFactory> StateMachineGraphPinConnectionFactory;
 
@@ -47,11 +44,9 @@ public:
 	virtual TSharedPtr<FExtensibilityManager> GetMenuExtensibilityManager() override { return MenuExtensibilityManager; };
 	virtual TSharedPtr<FExtensibilityManager> GetToolBarExtensibilityManager() override { return ToolBarExtensibilityManager; };
 
-	TSharedRef<FAssetEditorToolkit> CreateNpcEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UNpcBehaviorBlueprint* Blueprint);
 	TSharedRef<FAssetEditorToolkit> CreateStateMachineEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UStateMachineBlueprint* Blueprint);
 
 	void RegisterAssetActions();
-	void RegisterNpcBehaviorTasks();
 
 	/** IBlueprintCompiler implementation */
 	virtual bool CanCompile(const UBlueprint* Blueprint) override;

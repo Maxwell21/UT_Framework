@@ -27,9 +27,9 @@
 #include "ISectionLayoutBuilder.h"
 #include "EditorStyleSet.h"
 #include "MovieSceneTrackEditor.h"
-#include "../MovieSceneTools/Public/FloatCurveKeyArea.h"
-#include "../MovieSceneTools/Public/CommonMovieSceneTools.h"
-#include "../MovieSceneTools/Public/MatineeImportTools.h"
+#include "MovieSceneTools/Public/CommonMovieSceneTools.h"
+#include "MovieSceneTools/Public/MatineeImportTools.h"
+#include "Fonts/FontMeasure.h"
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
 
@@ -41,10 +41,11 @@ namespace FlipbookAnimationEditorConstants
 
 #define LOCTEXT_NAMESPACE "FlipbookAnimationTrackEditor"
 
-FFlipbookAnimationSection::FFlipbookAnimationSection( UMovieSceneSection& InSection )
+FFlipbookAnimationSection::FFlipbookAnimationSection(UMovieSceneSection& InSection, TWeakPtr<ISequencer> InSequencer)
 	: Section(*CastChecked<UMovieSceneFlipbookAnimationSection>(&InSection))
+	, Sequencer(InSequencer)
 	, InitialStartOffsetDuringResize(0.f)
-	, InitialStartTimeDuringResize(0.f)
+	, InitialStartTimeDuringResize(0)
 { }
 
 UMovieSceneSection* FFlipbookAnimationSection::GetSectionObject()
@@ -66,41 +67,41 @@ float FFlipbookAnimationSection::GetSectionHeight() const
 	return (float)FlipbookAnimationEditorConstants::AnimationTrackHeight;
 }
 
-void FFlipbookAnimationSection::GenerateSectionLayout( class ISectionLayoutBuilder& LayoutBuilder ) const
-{
-// 	WeightArea = MakeShareable( new FFloatCurveKeyArea( &Section.Params.Weight, &Section ) );
-// 
-// 	LayoutBuilder.AddKeyArea( "Weight", NSLOCTEXT( "FlipbookAnimationSection", "WeightArea", "Weight" ), WeightArea.ToSharedRef() );
-}
-
 int32 FFlipbookAnimationSection::OnPaintSection( FSequencerSectionPainter& Painter ) const
 {
 	const ESlateDrawEffect DrawEffects = Painter.bParentEnabled ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect;
-	
+
 	const FTimeToPixel& TimeToPixelConverter = Painter.GetTimeConverter();
 
 	int32 LayerId = Painter.PaintSectionBackground();
 
 	static const FSlateBrush* GenericDivider = FEditorStyle::GetBrush("Sequencer.GenericDivider");
 
+	if (!Section.HasStartFrame() || !Section.HasEndFrame())
+	{
+		return LayerId;
+	}
+
 	// Add lines where the animation starts and ends/loops
 	float AnimPlayRate = FMath::IsNearlyZero(Section.Params.PlayRate) ? 1.0f : Section.Params.PlayRate;
 	float SeqLength = (Section.Params.GetSequenceLength() - (Section.Params.StartOffset + Section.Params.EndOffset)) / AnimPlayRate;
 
+	FFrameRate TickResolution = TimeToPixelConverter.GetTickResolution();
 	if (!FMath::IsNearlyZero(SeqLength, KINDA_SMALL_NUMBER) && SeqLength > 0)
 	{
-		float MaxOffset = Section.GetRange().Size<float>();
+		float MaxOffset = Section.GetRange().Size<FFrameTime>() / TickResolution;
 		float OffsetTime = SeqLength;
+		float StartTime = Section.GetInclusiveStartFrame() / TickResolution;
 
 		while (OffsetTime < MaxOffset)
 		{
-			float OffsetPixel = TimeToPixelConverter.TimeToPixel(Section.GetStartTime() + OffsetTime) - TimeToPixelConverter.TimeToPixel(Section.GetStartTime());
+			float OffsetPixel = TimeToPixelConverter.SecondsToPixel(StartTime + OffsetTime) - TimeToPixelConverter.SecondsToPixel(StartTime);
 
 			FSlateDrawElement::MakeBox(
 				Painter.DrawElements,
 				LayerId,
 				Painter.SectionGeometry.MakeChild(
-					FVector2D(2.f, Painter.SectionGeometry.Size.Y-2.f),
+					FVector2D(2.f, Painter.SectionGeometry.Size.Y - 2.f),
 					FSlateLayoutTransform(FVector2D(OffsetPixel, 1.f))
 				).ToPaintGeometry(),
 				GenericDivider,
@@ -117,21 +118,23 @@ int32 FFlipbookAnimationSection::OnPaintSection( FSequencerSectionPainter& Paint
 void FFlipbookAnimationSection::BeginResizeSection()
 {
 	InitialStartOffsetDuringResize = Section.Params.StartOffset;
-	InitialStartTimeDuringResize = Section.GetStartTime();
+	InitialStartTimeDuringResize = Section.HasStartFrame() ? Section.GetInclusiveStartFrame() : 0;
 }
 
-void FFlipbookAnimationSection::ResizeSection(ESequencerSectionResizeMode ResizeMode, float ResizeTime)
+void FFlipbookAnimationSection::ResizeSection(ESequencerSectionResizeMode ResizeMode, FFrameNumber ResizeFrameNumber)
 {
 	// Adjust the start offset when resizing from the beginning
 	if (ResizeMode == SSRM_LeadingEdge)
 	{
-		float StartOffset = (ResizeTime - InitialStartTimeDuringResize) * Section.Params.PlayRate;
+		FFrameRate FrameRate = Section.GetTypedOuter<UMovieScene>()->GetTickResolution();
+		float      StartOffset = (ResizeFrameNumber - InitialStartTimeDuringResize) / FrameRate * Section.Params.PlayRate;
+
 		StartOffset += InitialStartOffsetDuringResize;
 
 		// Ensure start offset is not less than 0 and adjust ResizeTime
 		if (StartOffset < 0)
 		{
-			ResizeTime = ResizeTime - (StartOffset / Section.Params.PlayRate);
+			ResizeFrameNumber = ResizeFrameNumber - ((StartOffset * Section.Params.PlayRate) * FrameRate).RoundToFrame();
 
 			StartOffset = 0.f;
 		}
@@ -139,7 +142,7 @@ void FFlipbookAnimationSection::ResizeSection(ESequencerSectionResizeMode Resize
 		Section.Params.StartOffset = StartOffset;
 	}
 
-	ISequencerSection::ResizeSection(ResizeMode, ResizeTime);
+	ISequencerSection::ResizeSection(ResizeMode, ResizeFrameNumber);
 }
 
 void FFlipbookAnimationSection::BeginSlipSection()
@@ -147,9 +150,9 @@ void FFlipbookAnimationSection::BeginSlipSection()
 	BeginResizeSection();
 }
 
-void FFlipbookAnimationSection::SlipSection(float SlipTime)
+void FFlipbookAnimationSection::SlipSection(double SlipTime)
 {
-	float StartOffset = (SlipTime - InitialStartTimeDuringResize) * Section.Params.PlayRate;
+	float StartOffset = (SlipTime - InitialStartTimeDuringResize / Section.GetTypedOuter<UMovieScene>()->GetTickResolution()) * Section.Params.PlayRate;
 	StartOffset += InitialStartOffsetDuringResize;
 
 	// Ensure start offset is not less than 0
@@ -167,7 +170,6 @@ FFlipbookAnimationTrackEditor::FFlipbookAnimationTrackEditor( TSharedRef<ISequen
 	: FMovieSceneTrackEditor( InSequencer ) 
 { }
 
-
 TSharedRef<ISequencerTrackEditor> FFlipbookAnimationTrackEditor::CreateTrackEditor( TSharedRef<ISequencer> InSequencer )
 {
 	return MakeShareable( new FFlipbookAnimationTrackEditor( InSequencer ) );
@@ -182,7 +184,7 @@ TSharedRef<ISequencerSection> FFlipbookAnimationTrackEditor::MakeSectionInterfac
 {
 	check( SupportsType( SectionObject.GetOuter()->GetClass() ) );
 	
-	return MakeShareable( new FFlipbookAnimationSection(SectionObject) );
+	return MakeShareable(new FFlipbookAnimationSection(SectionObject, GetSequencer()));
 }
 
 void FFlipbookAnimationTrackEditor::AddKey(const FGuid& ObjectGuid)
@@ -205,7 +207,7 @@ void FFlipbookAnimationTrackEditor::AddKey(const FGuid& ObjectGuid)
 				BuildAnimationSubMenu(ObjectGuid, nullptr),
 				FSlateApplication::Get().GetCursorPos(),
 				FPopupTransitionEffect(FPopupTransitionEffect::TypeInPopup)
-				);
+			);
 		}
 	}
 }
@@ -226,12 +228,16 @@ bool FFlipbookAnimationTrackEditor::HandleAssetAdded(UObject* Asset, const FGuid
 				
 				UMovieSceneTrack* Track = nullptr;
 
-				AnimatablePropertyChanged(FOnKeyProperty::CreateRaw(this, &FFlipbookAnimationTrackEditor::AddKeyInternal, Object, AnimSequence, Track));
+				const FScopedTransaction Transaction(LOCTEXT("AddAnimation_Transaction", "Add Animation"));
+
+				int32 RowIndex = INDEX_NONE;
+				AnimatablePropertyChanged(FOnKeyProperty::CreateRaw(this, &FFlipbookAnimationTrackEditor::AddKeyInternal, Object, AnimSequence, Track, RowIndex));
 
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -310,15 +316,16 @@ void FFlipbookAnimationTrackEditor::OnAnimationAssetSelected(const FAssetData& A
 		UPaperFlipbook* AnimSequence = CastChecked<UPaperFlipbook>(AssetData.GetAsset());
 
 		UObject* Object = SequencerPtr->FindSpawnedObjectOrTemplate(ObjectBinding);
-		AnimatablePropertyChanged( FOnKeyProperty::CreateRaw( this, &FFlipbookAnimationTrackEditor::AddKeyInternal, Object, AnimSequence, Track) );
+		int32 RowIndex = INDEX_NONE;
+		AnimatablePropertyChanged(FOnKeyProperty::CreateRaw(this, &FFlipbookAnimationTrackEditor::AddKeyInternal, Object, AnimSequence, Track, RowIndex));
 	}
 }
 
-FKeyPropertyResult FFlipbookAnimationTrackEditor::AddKeyInternal( float KeyTime, UObject* Object, class UPaperFlipbook* AnimSequence, UMovieSceneTrack* Track )
+FKeyPropertyResult FFlipbookAnimationTrackEditor::AddKeyInternal(FFrameNumber KeyTime, UObject* Object, class UPaperFlipbook* AnimSequence, UMovieSceneTrack* Track, int32 RowIndex)
 {
 	FKeyPropertyResult KeyPropertyResult;
 
-	FFindOrCreateHandleResult HandleResult = FindOrCreateHandleToObject( Object );
+	FFindOrCreateHandleResult HandleResult = FindOrCreateHandleToObject(Object);
 	FGuid ObjectHandle = HandleResult.Handle;
 	KeyPropertyResult.bHandleCreated |= HandleResult.bWasCreated;
 	if (ObjectHandle.IsValid())
@@ -333,8 +340,12 @@ FKeyPropertyResult FFlipbookAnimationTrackEditor::AddKeyInternal( float KeyTime,
 		{
 			Track->Modify();
 
-			Cast<UMovieSceneFlipbookAnimationTrack>(Track)->AddNewAnimation( KeyTime, AnimSequence );
+			UMovieSceneSection* NewSection = Cast<UMovieSceneFlipbookAnimationTrack>(Track)->AddNewAnimationOnRow(KeyTime, AnimSequence, RowIndex);
 			KeyPropertyResult.bTrackModified = true;
+
+			GetSequencer()->EmptySelection();
+			GetSequencer()->SelectSection(NewSection);
+			GetSequencer()->ThrobSectionSelection();
 		}
 	}
 
@@ -343,7 +354,7 @@ FKeyPropertyResult FFlipbookAnimationTrackEditor::AddKeyInternal( float KeyTime,
 
 void CopyInterpAnimControlTrack(TSharedRef<ISequencer> Sequencer, UInterpTrackAnimControl* MatineeAnimControlTrack, UMovieSceneFlipbookAnimationTrack* FlipbookAnimationTrack)
 {
-	float EndPlaybackRange = Sequencer.Get().GetFocusedMovieSceneSequence()->GetMovieScene()->GetPlaybackRange().GetUpperBoundValue();
+//	float EndPlaybackRange = Sequencer->GetFocusedMovieSceneSequence()->GetMovieScene()->GetPlaybackRange().GetUpperBoundValue();
 
 // 	if (FMatineeImportTools::CopyInterpAnimControlTrack(MatineeAnimControlTrack, FlipbookAnimationTrack, EndPlaybackRange))
 // 	{

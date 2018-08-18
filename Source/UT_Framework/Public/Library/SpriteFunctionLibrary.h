@@ -79,7 +79,7 @@ public:
 	// Returns a human readable description of the latent operation's current state
 	virtual FString GetDescription() const override
 	{
-		return FString::Printf(*NSLOCTEXT("FlipbookMontageAction", "FFlipbookMontageActionTime", "Animation time remaining (%.3f seconds left)").ToString(), TimeRemaining);
+		return FText::Format(NSLOCTEXT("FlipbookMontageAction", "FFlipbookMontageActionTime", "Animation time remaining (%.3f seconds left)"), FText::AsNumber(TimeRemaining)).ToString();
 	}
 
 #endif

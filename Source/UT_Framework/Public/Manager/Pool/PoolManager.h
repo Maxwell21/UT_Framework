@@ -46,7 +46,7 @@ public:
 	UFUNCTION(Category = "PoolManager", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static AActor* SpawnActorFromPool(UObject* WorldContextObject, FName Key, FTransform Transform);
 
-	UFUNCTION(Category = "PoolManager", BlueprintCallable, meta = (WorldContext = "WorldContextObject", ExpandEnumAsExecs = "Outputs"))
+	UFUNCTION(Category = "PoolManager", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static inline APoolManager* GetPoolManager(UObject* WorldContextObject)
 	{	
 		class UWorld* World = WorldContextObject->GetWorld();

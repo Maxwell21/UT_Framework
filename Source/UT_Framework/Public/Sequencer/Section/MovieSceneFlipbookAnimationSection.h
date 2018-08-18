@@ -5,10 +5,11 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
-#include "Curves/KeyHandle.h"
 #include "MovieSceneSection.h"
+#include "Channels/MovieSceneFloatChannel.h"
 #include "PaperFlipbook.h"
 #include "MovieSceneFlipbookAnimationSection.generated.h"
 
@@ -73,27 +74,23 @@ public:
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
-	//~ MovieSceneSection interface
+	/** Get Frame Time as Animation Time*/
+	UT_FRAMEWORK_API float MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const;
 
-	virtual void MoveSection( float DeltaPosition, TSet<FKeyHandle>& KeyHandles ) override;
-	virtual void DilateSection( float DilationFactor, float Origin, TSet<FKeyHandle>& KeyHandles  ) override;
-	virtual UMovieSceneSection* SplitSection(float SplitTime) override;
-	virtual void GetKeyHandles(TSet<FKeyHandle>& OutKeyHandles, TRange<float> TimeRange) const override;
-	virtual void GetSnapTimes(TArray<float>& OutSnapTimes, bool bGetSectionBorders) const override;
-	virtual TOptional<float> GetOffsetTime() const override { return TOptional<float>(Params.StartOffset); }
-	virtual TOptional<float> GetKeyTime( FKeyHandle KeyHandle ) const override { return TOptional<float>(); }
-	virtual void SetKeyTime( FKeyHandle KeyHandle, float Time ) override { }
+	//~ MovieSceneSection interface
+	virtual UMovieSceneSection* SplitSection(FQualifiedFrameTime SplitTime) override;
+	virtual void GetSnapTimes(TArray<FFrameNumber>& OutSnapTimes, bool bGetSectionBorders) const override;
 	virtual FMovieSceneEvalTemplatePtr GenerateTemplate() const override;
 
 	/** ~UObject interface */
 	virtual void PostLoad() override;
 	virtual void Serialize(FArchive& Ar) override;
-private:
-
-	//~ UObject interface
 
 #if WITH_EDITOR
 
+private:
+
+	//~ UObject interface
 	virtual void PreEditChange(UProperty* PropertyAboutToChange) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	float PreviousPlayRate;

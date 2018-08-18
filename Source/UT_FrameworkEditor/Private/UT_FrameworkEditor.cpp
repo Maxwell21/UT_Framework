@@ -5,23 +5,11 @@
 
 #include "UT_FrameworkEditor.h"
 
-// Npc
-#include "NpcEditor.h"
-#include "NpcBehaviorBlueprint.h"
-#include "NpcBehaviorGraphFactory.h"
-#include "NpcBehaviorUtilities.h"
-
 // StateMachine
 #include "StateMachineEditor.h"
 #include "StateMachineBlueprintCompiler.h"
 #include "StateMachineBlueprint.h"
 #include "StateMachineGraphFactory.h"
-
-// Tasks
-#include "NpcBehaviorTaskFactory_Wait.h"
-#include "NpcBehaviorTaskFactory_MoveTo.h"
-#include "NpcBehaviorTaskFactory_Restart.h"
-#include "NpcBehaviorTaskFactory_RandomBranch.h"
 
 // Styles
 #include "FrameworkStyle.h"
@@ -34,7 +22,6 @@
 #include "IAssetTools.h"
 #include "IAssetTypeActions.h"
 #include "AssetTypeCategories.h"
-#include "AssetTypeActions_NpcBehavior.h"
 #include "AssetTypeActions_StateMachine.h"
 
 // Debuggers
@@ -54,10 +41,8 @@ void FUT_FrameworkEditorModule::StartupModule()
 	ToolBarExtensibilityManager = MakeShareable(new FExtensibilityManager());
 
 	// Factories
-	NpcBehaviorGraphFactory = MakeShareable(new FNpcBehaviorGraphFactory());
 	StateMachineGraphFactory = MakeShareable(new FStateMachineGraphFactory());
 	StateMachineGraphPinConnectionFactory = MakeShareable(new FStateMachineGraphPinConnectionFactory());
-	FEdGraphUtilities::RegisterVisualNodeFactory(NpcBehaviorGraphFactory);
 	FEdGraphUtilities::RegisterVisualNodeFactory(StateMachineGraphFactory);
 	FEdGraphUtilities::RegisterVisualPinConnectionFactory(StateMachineGraphPinConnectionFactory);
 
@@ -68,9 +53,6 @@ void FUT_FrameworkEditorModule::StartupModule()
 	// Compilers
 	IKismetCompilerInterface& KismetCompilerModule = FModuleManager::LoadModuleChecked<IKismetCompilerInterface>("KismetCompiler");
 	KismetCompilerModule.GetCompilers().Add(this);
-
-	// NpcBehaviorTasks
-	this->RegisterNpcBehaviorTasks();
 
 	// Debuggers
 	#if WITH_GAMEPLAY_DEBUGGER
@@ -94,7 +76,6 @@ void FUT_FrameworkEditorModule::ShutdownModule()
 	ToolBarExtensibilityManager.Reset();
 
 	// Factories
-	FEdGraphUtilities::UnregisterVisualNodeFactory(NpcBehaviorGraphFactory);
 	FEdGraphUtilities::UnregisterVisualNodeFactory(StateMachineGraphFactory);
 	FEdGraphUtilities::UnregisterVisualPinConnectionFactory(StateMachineGraphPinConnectionFactory);
 
@@ -116,14 +97,6 @@ void FUT_FrameworkEditorModule::ShutdownModule()
 	#endif
 }
 
-TSharedRef<FAssetEditorToolkit> FUT_FrameworkEditorModule::CreateNpcEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UNpcBehaviorBlueprint* Blueprint)
-{
-	TSharedRef<FNpcEditor> NpcEditor(new FNpcEditor());
-	NpcEditor->InitEditor(Mode, InitToolkitHost, Blueprint);
-
-	return NpcEditor;
-}
-
 TSharedRef<FAssetEditorToolkit> FUT_FrameworkEditorModule::CreateStateMachineEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UStateMachineBlueprint* Blueprint)
 {
 	TSharedRef<FStateMachineEditor> StateMachineEditor(new FStateMachineEditor());
@@ -136,16 +109,7 @@ void FUT_FrameworkEditorModule::RegisterAssetActions()
 {
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 
-	AssetTools.RegisterAssetTypeActions(MakeShareable(new FAssetTypeActions_NpcBehavior));
 	AssetTools.RegisterAssetTypeActions(MakeShareable(new FAssetTypeActions_StateMachine));
-}
-
-void FUT_FrameworkEditorModule::RegisterNpcBehaviorTasks()
-{
-	FNpcBehaviorUtilities::RegisterTask(MakeShareable(new FNpcBehaviorTaskFactory_Wait));
-	FNpcBehaviorUtilities::RegisterTask(MakeShareable(new FNpcBehaviorTaskFactory_MoveTo));
-	FNpcBehaviorUtilities::RegisterTask(MakeShareable(new FNpcBehaviorTaskFactory_Restart));
-	FNpcBehaviorUtilities::RegisterTask(MakeShareable(new FNpcBehaviorTaskFactory_RandomBranch));
 }
 
 bool FUT_FrameworkEditorModule::CanCompile(const UBlueprint* Blueprint)

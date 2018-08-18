@@ -32,18 +32,20 @@ UMovieSceneFlipbookAnimationTrack::UMovieSceneFlipbookAnimationTrack(const FObje
 /* UMovieSceneFlipbookAnimationTrack interface
  *****************************************************************************/
 
-void UMovieSceneFlipbookAnimationTrack::AddNewAnimation(float KeyTime, UPaperFlipbook* AnimSequence)
+UMovieSceneSection* UMovieSceneFlipbookAnimationTrack::AddNewAnimationOnRow(FFrameNumber KeyTime, UPaperFlipbook* AnimSequence, int32 RowIndex)
 {
 	UMovieSceneFlipbookAnimationSection* NewSection = Cast<UMovieSceneFlipbookAnimationSection>(CreateNewSection());
 	{
-		NewSection->InitialPlacement(AnimationSections, KeyTime, KeyTime + AnimSequence->GetTotalDuration(), SupportsMultipleRows());
+		NewSection->InitialPlacement(AnimationSections, KeyTime, KeyTime.Value + AnimSequence->GetTotalDuration(), SupportsMultipleRows());
 		NewSection->Params.Animation = AnimSequence;
 	}
 
 	AddSection(*NewSection);
+
+	return NewSection;
 }
 
-TArray<UMovieSceneSection*> UMovieSceneFlipbookAnimationTrack::GetAnimSectionsAtTime(float Time)
+TArray<UMovieSceneSection*> UMovieSceneFlipbookAnimationTrack::GetAnimSectionsAtTime(FFrameNumber Time)
 {
 	TArray<UMovieSceneSection*> Sections;
 	for (auto Section : AnimationSections)
@@ -108,18 +110,6 @@ void UMovieSceneFlipbookAnimationTrack::RemoveSection(UMovieSceneSection& Sectio
 bool UMovieSceneFlipbookAnimationTrack::IsEmpty() const
 {
 	return AnimationSections.Num() == 0;
-}
-
-TRange<float> UMovieSceneFlipbookAnimationTrack::GetSectionBoundaries() const
-{
-	TArray<TRange<float>> Bounds;
-
-	for (auto Section : AnimationSections)
-	{
-		Bounds.Add(Section->GetRange());
-	}
-
-	return TRange<float>::Hull(Bounds);
 }
 
 #if WITH_EDITORONLY_DATA

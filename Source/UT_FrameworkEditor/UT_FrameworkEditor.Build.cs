@@ -7,23 +7,7 @@ public class UT_FrameworkEditor : ModuleRules
 	public UT_FrameworkEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"UT_FrameworkEditor/Public"
-				// ... add public include paths required here ...
-			}
-			);
-				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"UT_FrameworkEditor/Private",
-				// ... add other private include paths required here ...
-			}
-			);
-			
-		
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -55,6 +39,7 @@ public class UT_FrameworkEditor : ModuleRules
                 "Paper2D",
                 "Sequencer",
                 "MovieScene",
+                "MovieSceneTracks",
                 "MovieSceneTools",
                 "UT_Framework",
 				// ... add private dependencies that you statically link with here ...	
