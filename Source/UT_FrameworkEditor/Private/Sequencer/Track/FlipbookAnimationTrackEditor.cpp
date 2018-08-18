@@ -112,57 +112,6 @@ int32 FFlipbookAnimationSection::OnPaintSection( FSequencerSectionPainter& Paint
 		}
 	}
 
-	TSharedPtr<ISequencer> SequencerPtr = Sequencer.Pin();
-	if (Painter.bIsSelected && SequencerPtr.IsValid())
-	{
-		FFrameTime CurrentTime = SequencerPtr->GetLocalTime().Time;
-		if (Section.GetRange().Contains(CurrentTime.FrameNumber) && Section.Params.Animation != nullptr)
-		{
-			const float Time = TimeToPixelConverter.FrameToPixel(CurrentTime);
-
-			// Draw the current time next to the scrub handle
-			const float AnimTime = Section.MapTimeToAnimation(CurrentTime, TickResolution);
-			int32 FrameIdx = Section.Params.Animation->GetKeyFrameIndexAtTime(AnimTime);
-			int32 FrameTime = Section.Params.Animation->GetKeyFrameChecked(FrameIdx).FrameRun;
-			FString FrameString = FString::FromInt(FrameTime);
-
-			const FSlateFontInfo SmallLayoutFont = FCoreStyle::GetDefaultFontStyle("Bold", 10);
-			const TSharedRef< FSlateFontMeasure > FontMeasureService = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-			FVector2D TextSize = FontMeasureService->Measure(FrameString, SmallLayoutFont);
-
-			// Flip the text position if getting near the end of the view range
-			static const float TextOffsetPx = 10.f;
-			bool  bDrawLeft = (Painter.SectionGeometry.Size.X - Time) < (TextSize.X + 22.f) - TextOffsetPx;
-			float TextPosition = bDrawLeft ? Time - TextSize.X - TextOffsetPx : Time + TextOffsetPx;
-			//handle mirrored labels
-			const float MajorTickHeight = 9.0f;
-			FVector2D TextOffset(TextPosition, Painter.SectionGeometry.Size.Y - (MajorTickHeight + TextSize.Y));
-
-			const FLinearColor DrawColor = FEditorStyle::GetSlateColor("SelectionColor").GetColor(FWidgetStyle());
-			const FVector2D BoxPadding = FVector2D(4.0f, 2.0f);
-			// draw time string
-
-			FSlateDrawElement::MakeBox(
-				Painter.DrawElements,
-				LayerId + 5,
-				Painter.SectionGeometry.ToPaintGeometry(TextOffset - BoxPadding, TextSize + 2.0f * BoxPadding),
-				FEditorStyle::GetBrush("WhiteBrush"),
-				ESlateDrawEffect::None,
-				FLinearColor::Black.CopyWithNewOpacity(0.5f)
-			);
-
-			FSlateDrawElement::MakeText(
-				Painter.DrawElements,
-				LayerId + 6,
-				Painter.SectionGeometry.ToPaintGeometry(TextOffset, TextSize),
-				FrameString,
-				SmallLayoutFont,
-				DrawEffects,
-				DrawColor
-			);
-		}
-	}
-
 	return LayerId;
 }
 
