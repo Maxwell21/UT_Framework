@@ -5,7 +5,6 @@
 
 #include "MovieSceneFlipbookAnimationTemplate.h"
 #include "Compilation/MovieSceneCompilerRules.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "MovieSceneEvaluation.h"
 #include "IMovieScenePlayer.h"
 #include "ObjectKey.h"
@@ -140,12 +139,12 @@ namespace MovieSceneFlipbook
 			const bool bFireNotifies = !bPreviewPlayback || (PlayerStatus != EMovieScenePlayerStatus::Jumping && PlayerStatus != EMovieScenePlayerStatus::Stopped);
 
 			// When jumping from one cut to another cut, the delta time should be 0 so that anim notifies before the current position are not evaluated. Note, anim notifies at the current time should still be evaluated.
-			const float DeltaTime = Context.HasJumped() ? 0.f : Context.GetRange().Size<float>();
+			const FFrameTime DeltaTime = Context.HasJumped() ? FFrameTime() : Context.GetRange().Size<FFrameTime>();
 
 			const bool bResetDynamics = PlayerStatus == EMovieScenePlayerStatus::Stepping || 
 										PlayerStatus == EMovieScenePlayerStatus::Jumping || 
 										PlayerStatus == EMovieScenePlayerStatus::Scrubbing || 
-										(DeltaTime == 0.0f && PlayerStatus != EMovieScenePlayerStatus::Stopped); 
+										(DeltaTime.GetSubFrame() == 0.0f && PlayerStatus != EMovieScenePlayerStatus::Stopped); 
 		
 			static const bool bLooping = false;
 			for (const FMinimalAnimParameters& AnimParams : InFinalValue.AllAnimations)
@@ -156,7 +155,7 @@ namespace MovieSceneFlipbook
 				{
 					PreviewSetAnimPosition(PersistentData, Player, PaperFlipbookComponent,
 						AnimParams.Section, AnimParams.Animation, AnimParams.EvalTime,
-						bLooping, bFireNotifies, DeltaTime, Player.GetPlaybackStatus() == EMovieScenePlayerStatus::Playing, bResetDynamics);
+						bLooping, bFireNotifies, DeltaTime.GetSubFrame(), Player.GetPlaybackStatus() == EMovieScenePlayerStatus::Playing, bResetDynamics);
 				}
 				else
 				{
@@ -235,7 +234,7 @@ template<> FMovieSceneAnimTypeID GetBlendingDataType<MovieSceneFlipbook::FBlende
 }
 
 FMovieSceneFlipbookAnimationSectionTemplate::FMovieSceneFlipbookAnimationSectionTemplate(const UMovieSceneFlipbookAnimationSection& InSection)
-	: Params(InSection.Params, InSection.GetStartTime(), InSection.GetEndTime())
+	: Params(InSection.Params, InSection.GetInclusiveStartFrame().Value, InSection.GetExclusiveEndFrame().Value)
 {
 }
 
@@ -244,44 +243,46 @@ void FMovieSceneFlipbookAnimationSectionTemplate::Evaluate(const FMovieSceneEval
 	if (Params.Animation)
 	{
 		// calculate the time at which to evaluate the animation
-		float EvalTime = Params.MapTimeToAnimation(Context.GetTime());
+		float EvalTime = Params.MapTimeToAnimation(Context.GetTime(), Context.GetFrameRate());
 
 		FOptionalMovieSceneBlendType BlendType = SourceSection->GetBlendType();
 		check(BlendType.IsValid());
 
 		// Ensure the accumulator knows how to actually apply component transforms
-
- 		FMovieSceneBlendingActuatorID ActuatorTypeID = MovieSceneFlipbook::FComponentAnimationActuator::GetActuatorTypeID();
- 		FMovieSceneBlendingAccumulator& Accumulator = ExecutionTokens.GetBlendingAccumulator();
+		FMovieSceneBlendingActuatorID ActuatorTypeID = MovieSceneFlipbook::FComponentAnimationActuator::GetActuatorTypeID();
+		FMovieSceneBlendingAccumulator& Accumulator = ExecutionTokens.GetBlendingAccumulator();
 		if (!Accumulator.FindActuator<MovieSceneFlipbook::FBlendedAnimation>(ActuatorTypeID))
+		{
 			Accumulator.DefineActuator(ActuatorTypeID, MakeShared<MovieSceneFlipbook::FComponentAnimationActuator>());
+		}
+
+		UPaperFlipbook* Animation = Params.Animation;
 
 		// Add the blendable to the accumulator
-		FMinimalAnimParameters AnimParams(Params.Animation, EvalTime, ExecutionTokens.GetCurrentScope(), GetSourceSection());
-		
+		FMinimalAnimParameters AnimParams(Animation, EvalTime, ExecutionTokens.GetCurrentScope(), GetSourceSection());
 		ExecutionTokens.BlendToken(ActuatorTypeID, TBlendableToken<MovieSceneFlipbook::FBlendedAnimation>(AnimParams, BlendType.Get(), 1.f));
 	}
 }
 
-float FMovieSceneFlipbookAnimationSectionTemplateParameters::MapTimeToAnimation(float ThisPosition) const
+float FMovieSceneFlipbookAnimationSectionTemplateParameters::MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const
 {
-	ThisPosition = FMath::Clamp(ThisPosition, SectionStartTime, SectionEndTime);
+	InPosition = FMath::Clamp(InPosition, FFrameTime(SectionStartTime), FFrameTime(SectionEndTime - 1));
 
 	const float SectionPlayRate = PlayRate;
 	const float AnimPlayRate = FMath::IsNearlyZero(SectionPlayRate) ? 1.0f : SectionPlayRate;
 
 	const float SeqLength = GetSequenceLength() - (StartOffset + EndOffset);
 
-	ThisPosition = (ThisPosition - SectionStartTime) * AnimPlayRate;
+	float AnimPosition = FFrameTime::FromDecimal((InPosition - SectionStartTime).AsDecimal() * AnimPlayRate) / InFrameRate;
 	if (SeqLength > 0.f)
 	{
-		ThisPosition = FMath::Fmod(ThisPosition, SeqLength);
+		AnimPosition = FMath::Fmod(AnimPosition, SeqLength);
 	}
-	ThisPosition += StartOffset;
+	AnimPosition += StartOffset;
 	if (bReverse)
 	{
-		ThisPosition = (SeqLength - (ThisPosition - StartOffset)) + StartOffset;
+		AnimPosition = (SeqLength - (AnimPosition - StartOffset)) + StartOffset;
 	}
 
-	return ThisPosition;
+	return AnimPosition;
 }

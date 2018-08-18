@@ -7,23 +7,7 @@ public class UT_Framework : ModuleRules
 	public UT_Framework(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"UT_Framework/Public"
-				// ... add public include paths required here ...
-			}
-			);
 				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"UT_Framework/Private",
-				// ... add other private include paths required here ...
-			}
-			);
-			
-		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -45,6 +29,7 @@ public class UT_Framework : ModuleRules
                 "AIModule",
                 "Paper2D",
                 "MovieScene",
+                "MovieSceneTracks",
                 "GameplayTasks",
 				// ... add private dependencies that you statically link with here ...	
 			}

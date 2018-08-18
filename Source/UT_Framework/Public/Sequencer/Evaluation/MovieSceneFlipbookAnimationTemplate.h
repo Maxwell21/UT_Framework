@@ -21,23 +21,23 @@ struct FMovieSceneFlipbookAnimationSectionTemplateParameters : public FMovieScen
 	/************************************************************************/
 
 	UPROPERTY()
-	float SectionStartTime;
+	FFrameNumber SectionStartTime;
 
 	UPROPERTY()
-	float SectionEndTime;
+	FFrameNumber SectionEndTime;
 
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
 	FMovieSceneFlipbookAnimationSectionTemplateParameters() {}
-	FMovieSceneFlipbookAnimationSectionTemplateParameters(const FMovieSceneFlipbookAnimationParams& BaseParams, float InSectionStartTime, float InSectionEndTime)
+	FMovieSceneFlipbookAnimationSectionTemplateParameters(const FMovieSceneFlipbookAnimationParams& BaseParams, FFrameNumber InSectionStartTime, FFrameNumber InSectionEndTime)
 		: FMovieSceneFlipbookAnimationParams(BaseParams)
 		, SectionStartTime(InSectionStartTime)
 		, SectionEndTime(InSectionEndTime)
 	{}
 
-	float MapTimeToAnimation(float InPosition) const;
+	float MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const;
 };
 
 USTRUCT()

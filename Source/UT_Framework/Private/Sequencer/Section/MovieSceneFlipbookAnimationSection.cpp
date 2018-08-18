@@ -25,7 +25,7 @@ FMovieSceneFlipbookAnimationParams::FMovieSceneFlipbookAnimationParams()
 	bReverse = false;
 }
 
-UMovieSceneFlipbookAnimationSection::UMovieSceneFlipbookAnimationSection( const FObjectInitializer& ObjectInitializer )
+UMovieSceneFlipbookAnimationSection::UMovieSceneFlipbookAnimationSection(const FObjectInitializer& ObjectInitializer)
 	: Super( ObjectInitializer )
 {
 	BlendType = EMovieSceneBlendType::Absolute;
@@ -84,23 +84,16 @@ FMovieSceneEvalTemplatePtr UMovieSceneFlipbookAnimationSection::GenerateTemplate
 	return FMovieSceneFlipbookAnimationSectionTemplate(*this);
 }
 
-void UMovieSceneFlipbookAnimationSection::MoveSection( float DeltaTime, TSet<FKeyHandle>& KeyHandles )
+float UMovieSceneFlipbookAnimationSection::MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const
 {
-	Super::MoveSection(DeltaTime, KeyHandles);
+	FMovieSceneFlipbookAnimationSectionTemplateParameters TemplateParams(Params, GetInclusiveStartFrame(), GetExclusiveEndFrame());
+	return TemplateParams.MapTimeToAnimation(InPosition, InFrameRate);
 }
 
-
-void UMovieSceneFlipbookAnimationSection::DilateSection( float DilationFactor, float Origin, TSet<FKeyHandle>& KeyHandles )
-{
-	Params.PlayRate /= DilationFactor;
-
-	Super::DilateSection(DilationFactor, Origin, KeyHandles);
-}
-
-UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(float SplitTime)
+UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualifiedFrameTime SplitTime)
 {
 	float AnimPlayRate = FMath::IsNearlyZero(Params.PlayRate) ? 1.0f : Params.PlayRate;
-	float AnimPosition = (SplitTime - GetStartTime()) * AnimPlayRate;
+	float AnimPosition = (SplitTime.Time.GetSubFrame() - (float)GetInclusiveStartFrame().Value) * AnimPlayRate;
 	float SeqLength = Params.GetSequenceLength() - (Params.StartOffset + Params.EndOffset);
 
 	float NewOffset = FMath::Fmod(AnimPosition, SeqLength);
@@ -115,43 +108,13 @@ UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(float Spli
 	return NewSection;
 }
 
-
-void UMovieSceneFlipbookAnimationSection::GetKeyHandles(TSet<FKeyHandle>& OutKeyHandles, TRange<float> TimeRange) const
-{
-	if (!TimeRange.Overlaps(GetRange()))
-		return;
-// 
-// 	for (auto It(Params.Weight.GetKeyHandleIterator()); It; ++It)
-// 	{
-// 		float Time = Params.Weight.GetKeyTime(It.Key());
-// 		if (TimeRange.Contains(Time))
-// 		{
-// 			OutKeyHandles.Add(It.Key());
-// 		}
-// 	}
-}
-
-void UMovieSceneFlipbookAnimationSection::GetSnapTimes(TArray<float>& OutSnapTimes, bool bGetSectionBorders) const
+void UMovieSceneFlipbookAnimationSection::GetSnapTimes(TArray<FFrameNumber>& OutSnapTimes, bool bGetSectionBorders) const
 {
 	Super::GetSnapTimes(OutSnapTimes, bGetSectionBorders);
-
-	float CurrentTime = GetStartTime();
-	float AnimPlayRate = FMath::IsNearlyZero(Params.PlayRate) ? 1.0f : Params.PlayRate;
-	float SeqLength = (Params.GetSequenceLength() - (Params.StartOffset + Params.EndOffset)) / AnimPlayRate;
-
-	// Snap to the repeat times
-	while (CurrentTime <= GetEndTime() && !FMath::IsNearlyZero(SeqLength, KINDA_SMALL_NUMBER) && SeqLength > 0)
-	{
-		if (CurrentTime >= GetStartTime())
-		{
-			OutSnapTimes.Add(CurrentTime);
-		}
-
-		CurrentTime += SeqLength;
-	}
 }
 
 #if WITH_EDITOR
+
 void UMovieSceneFlipbookAnimationSection::PreEditChange(UProperty* PropertyAboutToChange)
 {
 	// Store the current play rate so that we can compute the amount to compensate the section end time when the play rate changes
@@ -162,23 +125,6 @@ void UMovieSceneFlipbookAnimationSection::PreEditChange(UProperty* PropertyAbout
 
 void UMovieSceneFlipbookAnimationSection::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	// Adjust the duration automatically if the play rate changes
-	if (PropertyChangedEvent.Property != nullptr &&
-		PropertyChangedEvent.Property->GetFName() == TEXT("PlayRate"))
-	{
-		float NewPlayRate = Params.PlayRate;
-
-		if (!FMath::IsNearlyZero(NewPlayRate))
-		{
-			float CurrentDuration = GetEndTime() - GetStartTime();
-			float NewDuration = CurrentDuration * (PreviousPlayRate / NewPlayRate);
-			float NewEndTime = GetStartTime() + NewDuration;
-			SetEndTime(NewEndTime);
-
-			PreviousPlayRate = NewPlayRate;
-		}
-	}
-
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
