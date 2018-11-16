@@ -48,7 +48,11 @@ public:
 	UStateMachine* GetStateMachine();
 
 #if WITH_EDITOR
+
 	virtual UClass* GetBlueprintClass() const override;
+
+	virtual bool SupportsInputEvents() const override;
+
 #endif
 
 };

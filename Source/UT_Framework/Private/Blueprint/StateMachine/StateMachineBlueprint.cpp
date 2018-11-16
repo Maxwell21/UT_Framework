@@ -18,4 +18,10 @@ UClass* UStateMachineBlueprint::GetBlueprintClass() const
 {
 	return UStateMachineBlueprintGeneratedClass::StaticClass();
 }
+
+bool UStateMachineBlueprint::SupportsInputEvents() const
+{
+	return true;
+}
+
 #endif

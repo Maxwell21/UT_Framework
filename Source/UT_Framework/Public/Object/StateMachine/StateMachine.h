@@ -15,6 +15,9 @@ class UStateMachineState_Default;
 class UStateMachineState_Entry;
 class UStateMachineBlueprintGeneratedClass;
 class UWorld;
+class APlayerController;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStateMachineDelegate);
 
 USTRUCT(BlueprintType, Blueprintable)
 struct UT_FRAMEWORK_API FTransition
@@ -107,6 +110,25 @@ class UT_FRAMEWORK_API UStateMachine : public UObject, public FTickableGameObjec
 public:
 
 	/************************************************************************/
+	/* DELEGATES                                                            */
+	/************************************************************************/
+
+	UPROPERTY(Category = "State Machine", BlueprintAssignable)
+	FStateMachineDelegate OnInit;
+
+	UPROPERTY(Category = "State Machine", BlueprintAssignable)
+	FStateMachineDelegate OnPause;
+
+	UPROPERTY(Category = "State Machine", BlueprintAssignable)
+	FStateMachineDelegate OnUnPause;
+
+	UPROPERTY(Category = "State Machine", BlueprintAssignable)
+	FStateMachineDelegate OnStart;
+
+	UPROPERTY(Category = "State Machine", BlueprintAssignable)
+	FStateMachineDelegate OnStop;
+
+	/************************************************************************/
 	/* PROPERTIES                                                           */
 	/************************************************************************/
 
@@ -125,6 +147,10 @@ public:
 	/** Current owner */
 	UPROPERTY(Category = "State Machine", BlueprintReadOnly)
 	UObject* OwnerObject;
+
+	/** PlayerController */
+	UPROPERTY(Category = "State Machine", BlueprintReadOnly)
+	APlayerController* PlayerController;
 
 	/**
 	* If true the "Update" function of current state will be triggered 
@@ -151,11 +177,11 @@ public:
 	*
 	* @params TSubclassOf<UStateMachineBlueprint> Template
 	* @params UObject* Owner
+	* @params APlayerController* PlayerController
 	*
 	* @return UStateMachine*
 	*/
-	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
-	static UStateMachine* ConstructStateMachine(TSubclassOf<UStateMachine> Template, UObject* Owner);
+	static UStateMachine* ConstructStateMachine(TSubclassOf<UStateMachine> Template, UObject* Owner, APlayerController* Controller);
 
 protected:
 
@@ -179,6 +205,12 @@ public:
 	*/
 	UFUNCTION(Category="Umbra Framework | State Machine", BlueprintCallable)
 	virtual void Start();
+
+	/**
+	* Stop state machine
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
+	virtual void Stop();
 
 	/**
 	 * Get the current world that contain the state machine
@@ -214,6 +246,18 @@ public:
 	* @params FState State
 	*/
 	void SetCurrentState(FState State);
+
+	/**
+	* @return FState
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable, BlueprintPure)
+	FState GetCurrentState();
+
+	/**
+	* @return FString
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable, BlueprintPure)
+	FString GetCurrentStateName();
 
 	/**
 	* Determine the root state
@@ -288,7 +332,7 @@ public:
 	/**
 	 * @return bool - If paused or not
 	 */
-	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintPure)
 	virtual bool IsPaused() const;
 
 	/** FTickableGameObject */

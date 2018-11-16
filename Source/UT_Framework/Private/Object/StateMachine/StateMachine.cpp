@@ -10,6 +10,7 @@
 #include "TimerManager.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 /************************************************************************/
 /* FTransition                                                          */
@@ -49,15 +50,18 @@ bool FState::IsValid()
 /* UStateMachine                                                        */
 /************************************************************************/
 
-UStateMachine* UStateMachine::ConstructStateMachine(TSubclassOf<UStateMachine> Template, UObject* Owner)
+UStateMachine* UStateMachine::ConstructStateMachine(TSubclassOf<UStateMachine> Template, UObject* Owner, APlayerController* Controller)
 {
 	if (!Template || !Owner)
 		return nullptr;
 
 	if (UStateMachine* StateMachine = NewObject<UStateMachine>(Owner->GetWorld(), Template, NAME_None, RF_Standalone))
 	{
-		StateMachine->Init(Owner);
+		if (Controller)
+			StateMachine->PlayerController = Controller;
 
+		StateMachine->Init(Owner);
+		
 		return StateMachine;
 	}
 
@@ -70,6 +74,7 @@ void UStateMachine::Init(UObject* Owner)
 		return;
 
 	this->OwnerObject = Owner;
+	this->OnInit.Broadcast();
 }
 
 void UStateMachine::CheckTransitionForCurrentState()
@@ -88,6 +93,7 @@ void UStateMachine::CheckTransitionForCurrentState()
 		{
 			FTransition* Transition = this->Transitions.Find(TransitionName);
 			FState State = this->GetStateByName(Transition->ToState);
+
 			// we notify the current state to finish is state and start the new one
 			this->FinishState();
 			this->SetCurrentState(State);
@@ -109,8 +115,19 @@ void UStateMachine::Start()
 			this->OnStateMachineStart();
 			this->SetCurrentState(this->GetRootState());
 			this->BeginState();
+
+			this->OnStart.Broadcast();
 		}
 	}
+}
+
+void UStateMachine::Stop()
+{
+	this->UseTick = false;
+	this->CurrentState = FState();
+	this->OnStop.Broadcast();
+	this->ConditionalBeginDestroy();
+	GEngine->ForceGarbageCollection(true);
 }
 
 void UStateMachine::ExecuteInnerFunction(FName FunctionName, void* Params/* = nullptr*/)
@@ -146,6 +163,16 @@ FState UStateMachine::GetStateByName(FString Name)
 void UStateMachine::SetCurrentState(FState State)
 {
 	this->CurrentState = State;
+}
+
+FState UStateMachine::GetCurrentState()
+{
+	return this->CurrentState;
+}
+
+FString UStateMachine::GetCurrentStateName()
+{
+	return this->GetCurrentState().Name;
 }
 
 void UStateMachine::SetRootState(FString Name)
@@ -286,12 +313,14 @@ void UStateMachine::Pause()
 {
 	this->Paused = true;
 	this->UseTick = false;
+	this->OnPause.Broadcast();
 }
 
 void UStateMachine::UnPaused()
 {
 	this->Paused = false;
 	this->UseTick = true;
+	this->OnUnPause.Broadcast();
 }
 
 bool UStateMachine::IsPaused() const
