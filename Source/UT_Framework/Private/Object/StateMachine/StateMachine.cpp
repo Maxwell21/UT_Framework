@@ -10,6 +10,7 @@
 #include "TimerManager.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "Engine/InputDelegateBinding.h"
 #include "GameFramework/PlayerController.h"
 
 /************************************************************************/

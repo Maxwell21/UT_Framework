@@ -51,8 +51,6 @@ public:
 
 	virtual UClass* GetBlueprintClass() const override;
 
-	virtual bool SupportsInputEvents() const override;
-
 #endif
 
 };
