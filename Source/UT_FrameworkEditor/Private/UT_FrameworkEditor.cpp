@@ -51,8 +51,9 @@ void FUT_FrameworkEditorModule::StartupModule()
 	FlipbookTrackCreateEditorHandle = SequencerModule.RegisterTrackEditor(FOnCreateTrackEditor::CreateStatic(&FFlipbookAnimationTrackEditor::CreateTrackEditor));
 
 	// Compilers
-	IKismetCompilerInterface& KismetCompilerModule = FModuleManager::LoadModuleChecked<IKismetCompilerInterface>("KismetCompiler");
+ 	IKismetCompilerInterface& KismetCompilerModule = FModuleManager::LoadModuleChecked<IKismetCompilerInterface>("KismetCompiler");
 	KismetCompilerModule.GetCompilers().Add(this);
+	FKismetCompilerContext::RegisterCompilerForBP(UStateMachineBlueprint::StaticClass(), &FUT_FrameworkEditorModule::GetCompilerForBlueprint);
 
 	// Debuggers
 	#if WITH_GAMEPLAY_DEBUGGER
@@ -125,6 +126,11 @@ void FUT_FrameworkEditorModule::Compile(UBlueprint* Blueprint, const FKismetComp
 		Compiler.Compile();
 		check(Compiler.NewClass);
 	}
+}
+
+TSharedPtr<FKismetCompilerContext> FUT_FrameworkEditorModule::GetCompilerForBlueprint(UBlueprint* BP, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompileOptions)
+{
+	return TSharedPtr<FKismetCompilerContext>(new FStateMachineBlueprintCompiler(CastChecked<UStateMachineBlueprint>(BP), InMessageLog, InCompileOptions, nullptr));
 }
 
 #undef LOCTEXT_NAMESPACE

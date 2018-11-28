@@ -51,6 +51,7 @@ public:
 	/** IBlueprintCompiler implementation */
 	virtual bool CanCompile(const UBlueprint* Blueprint) override;
 	virtual void Compile(UBlueprint* Blueprint, const FKismetCompilerOptions& CompileOptions, FCompilerResultsLog& Results, TArray<UObject *>* ObjLoaded) override;
+	static TSharedPtr<FKismetCompilerContext> GetCompilerForBlueprint(UBlueprint* BP, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompileOptions);
 
 	static inline FUT_FrameworkEditorModule& Get()
 	{

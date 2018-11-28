@@ -18,4 +18,5 @@ UClass* UStateMachineBlueprint::GetBlueprintClass() const
 {
 	return UStateMachineBlueprintGeneratedClass::StaticClass();
 }
+
 #endif

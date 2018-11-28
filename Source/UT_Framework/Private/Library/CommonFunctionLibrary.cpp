@@ -8,8 +8,13 @@
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerInput.h"
 
 TMap<FName, FTimerMapRangeData> UCommonFunctionLibrary::TimeMapRangeData = TMap<FName, FTimerMapRangeData>();
+TMap<FName, FActionKeysCache> UCommonFunctionLibrary::CachedActions = TMap<FName, FActionKeysCache>();
+TMap<FName, FActionKeysCache> UCommonFunctionLibrary::CachedAxis = TMap<FName, FActionKeysCache>();
 
 FName UCommonFunctionLibrary::SetMapRangeTimerByEvent(const UObject* WorldContextObject, FDelegateMapRangeTimer Event, float Time, float Value, float InA, float InB, float OutA, float OutB, bool Reverse, bool Looping)
 {
@@ -83,6 +88,132 @@ void UCommonFunctionLibrary::CleanMapRangeTimer(const UObject* WorldContextObjec
 			UCommonFunctionLibrary::TimeMapRangeData.Remove(TimerKey);
 		}
 	}
+}
+
+TArray<FKey> UCommonFunctionLibrary::GetPlayerInputActionKeys(const UObject* WorldContextObject, bool &IsValid, FName ActionName, int32 PlayerIndex /*= 0*/)
+{
+	TArray<FKey> Keys = TArray<FKey>();
+
+	if (WorldContextObject && ActionName.IsValid())
+	{
+		if (UCommonFunctionLibrary::CachedActions.Find(ActionName))
+			Keys = UCommonFunctionLibrary::CachedActions[ActionName].Cachedkeys;
+		else
+		{
+			if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex))
+			{
+				TArray<FInputActionKeyMapping> ActionMappings = PlayerController->PlayerInput->GetKeysForAction(ActionName);
+				if (ActionMappings.Num() > 0)
+				{
+					for (auto const& ActionKey : ActionMappings)
+					{
+						Keys.Add(ActionKey.Key);
+					}
+
+					// Create cache
+					FActionKeysCache Cache = FActionKeysCache();
+					Cache.Cachedkeys = Keys;
+					UCommonFunctionLibrary::CachedActions.Add(ActionName, Cache);
+				}
+			}
+		}
+	}
+
+	IsValid = Keys.Num() > 0;
+	return Keys;
+}
+
+float UCommonFunctionLibrary::GetPlayerInputActionTimeDown(const UObject* WorldContextObject, FName ActionName, int32 PlayerIndex /*= 0*/)
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex);
+	if (!WorldContextObject || !ActionName.IsValid() || !PlayerController)
+		return 0.f;
+
+	bool ValidAction = false;
+	TArray<FKey> Keys = GetPlayerInputActionKeys(WorldContextObject, ValidAction, ActionName, PlayerIndex);
+	if (ValidAction)
+	{
+		for (auto const& Key : Keys)
+		{
+			float Time = PlayerController->GetInputKeyTimeDown(Key);
+			if (Time > 0.f)
+				return Time;
+		}
+	}
+
+	return 0.f;
+}
+
+TArray<FKey> UCommonFunctionLibrary::GetPlayerInputAxisKeys(const UObject* WorldContextObject, bool &IsValid, FName AxisName, int32 PlayerIndex /*= 0*/)
+{
+	TArray<FKey> Keys = TArray<FKey>();
+	if (WorldContextObject && AxisName.IsValid())
+	{
+		if (UCommonFunctionLibrary::CachedAxis.Find(AxisName))
+			Keys = UCommonFunctionLibrary::CachedAxis[AxisName].Cachedkeys;
+		else 
+		{
+			if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex))
+			{
+				TArray<FInputAxisKeyMapping> AxisMappings = PlayerController->PlayerInput->GetKeysForAxis(AxisName);
+				if (AxisMappings.Num() > 0)
+				{
+					for (auto const& AxisKey : AxisMappings)
+					{
+						Keys.Add(AxisKey.Key);
+					}
+
+					// Create cache
+					FActionKeysCache Cache = FActionKeysCache();
+					Cache.Cachedkeys = Keys;
+					UCommonFunctionLibrary::CachedAxis.Add(AxisName, Cache);
+				}
+			}
+		}
+	}
+
+	IsValid = Keys.Num() > 0;
+	return Keys;
+}
+
+bool UCommonFunctionLibrary::WasPlayerInputActionJustPressed(const UObject* WorldContextObject, FName ActionName, int32 PlayerIndex /*= 0*/)
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex);
+	if (!WorldContextObject || !ActionName.IsValid() || !PlayerController)
+		return false;
+
+	bool ValidAction = false;
+	TArray<FKey> Keys =	GetPlayerInputActionKeys(WorldContextObject, ValidAction, ActionName, PlayerIndex);
+	if (ValidAction)
+	{
+		for (auto const& Key : Keys)
+		{
+			if (PlayerController->WasInputKeyJustPressed(Key))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool UCommonFunctionLibrary::WasPlayerInputActionJustReleased(const UObject* WorldContextObject, FName ActionName, int32 PlayerIndex /*= 0*/)
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex);
+	if (!WorldContextObject || !ActionName.IsValid() || !PlayerController)
+		return false;
+
+	bool ValidAction = false;
+	TArray<FKey> Keys = GetPlayerInputActionKeys(WorldContextObject, ValidAction, ActionName, PlayerIndex);
+	if (ValidAction)
+	{
+		for (auto const& Key : Keys)
+		{
+			if (PlayerController->WasInputKeyJustReleased(Key))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 void UCommonFunctionLibrary::RefreshAndCleanMapRangeTimer(const UObject* WorldContextObject)

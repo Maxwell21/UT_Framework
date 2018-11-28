@@ -48,7 +48,9 @@ public:
 	UStateMachine* GetStateMachine();
 
 #if WITH_EDITOR
+
 	virtual UClass* GetBlueprintClass() const override;
+
 #endif
 
 };
