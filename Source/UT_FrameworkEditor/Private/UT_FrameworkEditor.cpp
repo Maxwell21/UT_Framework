@@ -118,11 +118,11 @@ bool FUT_FrameworkEditorModule::CanCompile(const UBlueprint* Blueprint)
 	return Cast<UStateMachineBlueprint>(Blueprint) != nullptr;
 }
 
-void FUT_FrameworkEditorModule::Compile(UBlueprint* Blueprint, const FKismetCompilerOptions& CompileOptions, FCompilerResultsLog& Results, TArray<UObject *>* ObjLoaded)
+void FUT_FrameworkEditorModule::Compile(UBlueprint* Blueprint, const FKismetCompilerOptions& CompileOptions, FCompilerResultsLog& Results)
 {
 	if (UStateMachineBlueprint* StateMachineBlueprint = CastChecked<UStateMachineBlueprint>(Blueprint))
 	{
-		FStateMachineBlueprintCompiler Compiler(StateMachineBlueprint, Results, CompileOptions, ObjLoaded);
+		FStateMachineBlueprintCompiler Compiler(StateMachineBlueprint, Results, CompileOptions);
 		Compiler.Compile();
 		check(Compiler.NewClass);
 	}
@@ -130,7 +130,7 @@ void FUT_FrameworkEditorModule::Compile(UBlueprint* Blueprint, const FKismetComp
 
 TSharedPtr<FKismetCompilerContext> FUT_FrameworkEditorModule::GetCompilerForBlueprint(UBlueprint* BP, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompileOptions)
 {
-	return TSharedPtr<FKismetCompilerContext>(new FStateMachineBlueprintCompiler(CastChecked<UStateMachineBlueprint>(BP), InMessageLog, InCompileOptions, nullptr));
+	return TSharedPtr<FKismetCompilerContext>(new FStateMachineBlueprintCompiler(CastChecked<UStateMachineBlueprint>(BP), InMessageLog, InCompileOptions));
 }
 
 #undef LOCTEXT_NAMESPACE

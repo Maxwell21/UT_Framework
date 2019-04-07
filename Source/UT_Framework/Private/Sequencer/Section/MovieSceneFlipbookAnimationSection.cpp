@@ -19,10 +19,22 @@ namespace
 FMovieSceneFlipbookAnimationParams::FMovieSceneFlipbookAnimationParams()
 {
 	Animation = nullptr;
-	StartOffset = 0.f;
-	EndOffset = 0.f;
+	StartOffset = FFrameNumber(0);
+	EndOffset = FFrameNumber(0);
 	PlayRate = 1.f;
 	bReverse = false;
+}
+
+FFrameNumber GetStartOffsetAtTrimTime(FQualifiedFrameTime TrimTime, const FMovieSceneFlipbookAnimationParams& Params, FFrameNumber StartFrame, FFrameRate FrameRate)
+{
+	float AnimPlayRate = FMath::IsNearlyZero(Params.PlayRate) ? 1.0f : Params.PlayRate;
+	float AnimPosition = (TrimTime.Time - StartFrame) / TrimTime.Rate * AnimPlayRate;
+	float SeqLength = Params.GetSequenceLength() - FrameRate.AsSeconds(Params.StartOffset + Params.EndOffset) / AnimPlayRate;
+
+	FFrameNumber NewOffset = FrameRate.AsFrameNumber(FMath::Fmod(AnimPosition, SeqLength));
+	NewOffset += Params.StartOffset;
+
+	return NewOffset;
 }
 
 UMovieSceneFlipbookAnimationSection::UMovieSceneFlipbookAnimationSection(const FObjectInitializer& ObjectInitializer)
@@ -92,11 +104,9 @@ float UMovieSceneFlipbookAnimationSection::MapTimeToAnimation(FFrameTime InPosit
 
 UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualifiedFrameTime SplitTime)
 {
-	float AnimPlayRate = FMath::IsNearlyZero(Params.PlayRate) ? 1.0f : Params.PlayRate;
-	float AnimPosition = (SplitTime.Time.GetSubFrame() - (float)GetInclusiveStartFrame().Value) * AnimPlayRate;
-	float SeqLength = Params.GetSequenceLength() - (Params.StartOffset + Params.EndOffset);
+	FFrameRate FrameRate = GetTypedOuter<UMovieScene>()->GetTickResolution();
 
-	float NewOffset = FMath::Fmod(AnimPosition, SeqLength);
+	FFrameNumber NewOffset = HasStartFrame() ? GetStartOffsetAtTrimTime(SplitTime, Params, GetInclusiveStartFrame(), FrameRate) : 0;
 	NewOffset += Params.StartOffset;
 
 	UMovieSceneSection* NewSection = Super::SplitSection(SplitTime);

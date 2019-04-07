@@ -18,10 +18,10 @@
 
 UStateMachineGraphNode::UStateMachineGraphNode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer),
-	State(nullptr),
 	IsRootNode(false),
 	InputPin(nullptr),
-	OutputPin(nullptr)
+	OutputPin(nullptr),
+	State(nullptr)
 {
 	this->bCanRenameNode = true;
 }

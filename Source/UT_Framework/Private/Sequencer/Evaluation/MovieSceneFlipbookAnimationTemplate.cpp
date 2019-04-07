@@ -245,7 +245,7 @@ void FMovieSceneFlipbookAnimationSectionTemplate::Evaluate(const FMovieSceneEval
 		// calculate the time at which to evaluate the animation
 		float EvalTime = Params.MapTimeToAnimation(Context.GetTime(), Context.GetFrameRate());
 
-		FOptionalMovieSceneBlendType BlendType = SourceSection->GetBlendType();
+		FOptionalMovieSceneBlendType BlendType = GetSourceSection()->GetBlendType();
 		check(BlendType.IsValid());
 
 		// Ensure the accumulator knows how to actually apply component transforms
@@ -271,17 +271,17 @@ float FMovieSceneFlipbookAnimationSectionTemplateParameters::MapTimeToAnimation(
 	const float SectionPlayRate = PlayRate;
 	const float AnimPlayRate = FMath::IsNearlyZero(SectionPlayRate) ? 1.0f : SectionPlayRate;
 
-	const float SeqLength = GetSequenceLength() - (StartOffset + EndOffset);
+	const float SeqLength = GetSequenceLength() - InFrameRate.AsSeconds(StartOffset + EndOffset);
 
 	float AnimPosition = FFrameTime::FromDecimal((InPosition - SectionStartTime).AsDecimal() * AnimPlayRate) / InFrameRate;
 	if (SeqLength > 0.f)
 	{
 		AnimPosition = FMath::Fmod(AnimPosition, SeqLength);
 	}
-	AnimPosition += StartOffset;
+	AnimPosition += InFrameRate.AsSeconds(StartOffset);
 	if (bReverse)
 	{
-		AnimPosition = (SeqLength - (AnimPosition - StartOffset)) + StartOffset;
+		AnimPosition = (SeqLength - (AnimPosition - InFrameRate.AsSeconds(StartOffset))) + InFrameRate.AsSeconds(StartOffset);
 	}
 
 	return AnimPosition;

@@ -99,7 +99,7 @@ public:
 	virtual void BeginResizeSection() override;
 	virtual void ResizeSection(ESequencerSectionResizeMode ResizeMode, FFrameNumber ResizeFrameNumber) override;
 	virtual void BeginSlipSection() override;
-	virtual void SlipSection(double SlipTime) override;
+	virtual void SlipSection(FFrameNumber SlipTime) override;
 
 private:
 
@@ -110,7 +110,7 @@ private:
 	TWeakPtr<ISequencer> Sequencer;
 
 	/** Cached start offset value valid only during resize */
-	float InitialStartOffsetDuringResize;
+	FFrameNumber InitialStartOffsetDuringResize;
 	
 	/** Cached start time valid only during resize */
 	FFrameNumber InitialStartTimeDuringResize;

@@ -17,10 +17,10 @@
 
 TSharedPtr<class SGraphNode> FStateMachineGraphFactory::CreateNode(class UEdGraphNode* InNode) const
 {
-	if (UStateMachineGraphNode_Entry* Node = Cast<UStateMachineGraphNode_Entry>(InNode))
-		return SNew(SStateMachineGraphNode_Entry, Node);
-	else if (UStateMachineGraphNode_Transition* Node = Cast<UStateMachineGraphNode_Transition>(InNode))
-		return SNew(SStateMachineGraphNode_Transition, Node);
+	if (UStateMachineGraphNode_Entry* EntryNode = Cast<UStateMachineGraphNode_Entry>(InNode))
+		return SNew(SStateMachineGraphNode_Entry, EntryNode);
+	else if (UStateMachineGraphNode_Transition* TransitionNode = Cast<UStateMachineGraphNode_Transition>(InNode))
+		return SNew(SStateMachineGraphNode_Transition, TransitionNode);
 	else if (UStateMachineGraphNode* Node = Cast<UStateMachineGraphNode>(InNode))
 		return SNew(SStateMachineGraphNode, Node);
 
