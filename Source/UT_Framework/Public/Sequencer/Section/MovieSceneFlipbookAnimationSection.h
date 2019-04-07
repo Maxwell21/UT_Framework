@@ -13,7 +13,7 @@
 #include "PaperFlipbook.h"
 #include "MovieSceneFlipbookAnimationSection.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FMovieSceneFlipbookAnimationParams
 {
 	GENERATED_BODY()
@@ -24,11 +24,11 @@ struct FMovieSceneFlipbookAnimationParams
 
 	/** The offset into the beginning of the animation clip */
 	UPROPERTY(EditAnywhere, Category = "Animation")
-	float StartOffset;
+	FFrameNumber StartOffset;
 
 	/** The offset into the end of the animation clip */
 	UPROPERTY(EditAnywhere, Category = "Animation")
-	float EndOffset;
+	FFrameNumber EndOffset;
 
 	/** The playback rate of the animation clip */
 	UPROPERTY(EditAnywhere, Category = "Animation")
@@ -53,7 +53,7 @@ struct FMovieSceneFlipbookAnimationParams
 };
 
 /**
- * Movie scene section that control skeletal animation
+ * Movie scene section that control flipbook animation
  */
 UCLASS( MinimalAPI )
 class UMovieSceneFlipbookAnimationSection

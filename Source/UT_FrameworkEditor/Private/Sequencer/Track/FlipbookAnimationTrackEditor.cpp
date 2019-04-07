@@ -29,6 +29,7 @@
 #include "MovieSceneTrackEditor.h"
 #include "MovieSceneTools/Public/CommonMovieSceneTools.h"
 #include "MovieSceneTools/Public/MatineeImportTools.h"
+#include "MovieSceneTools/Public/MovieSceneToolHelpers.h"
 #include "Fonts/FontMeasure.h"
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
@@ -69,7 +70,7 @@ UPaperFlipbookComponent* AcquireFlipbookComponentFromObjectGuid(const FGuid& Gui
 FFlipbookAnimationSection::FFlipbookAnimationSection(UMovieSceneSection& InSection, TWeakPtr<ISequencer> InSequencer)
 	: Section(*CastChecked<UMovieSceneFlipbookAnimationSection>(&InSection))
 	, Sequencer(InSequencer)
-	, InitialStartOffsetDuringResize(0.f)
+	, InitialStartOffsetDuringResize(0)
 	, InitialStartTimeDuringResize(0)
 { }
 
@@ -107,11 +108,12 @@ int32 FFlipbookAnimationSection::OnPaintSection( FSequencerSectionPainter& Paint
 		return LayerId;
 	}
 
+	FFrameRate TickResolution = TimeToPixelConverter.GetTickResolution();
+
 	// Add lines where the animation starts and ends/loops
 	float AnimPlayRate = FMath::IsNearlyZero(Section.Params.PlayRate) ? 1.0f : Section.Params.PlayRate;
-	float SeqLength = (Section.Params.GetSequenceLength() - (Section.Params.StartOffset + Section.Params.EndOffset)) / AnimPlayRate;
+	float SeqLength = Section.Params.GetSequenceLength() - (TickResolution.AsSeconds(Section.Params.StartOffset + Section.Params.EndOffset) / AnimPlayRate);
 
-	FFrameRate TickResolution = TimeToPixelConverter.GetTickResolution();
 	if (!FMath::IsNearlyZero(SeqLength, KINDA_SMALL_NUMBER) && SeqLength > 0)
 	{
 		float MaxOffset = Section.GetRange().Size<FFrameTime>() / TickResolution;
@@ -151,17 +153,17 @@ void FFlipbookAnimationSection::ResizeSection(ESequencerSectionResizeMode Resize
 	// Adjust the start offset when resizing from the beginning
 	if (ResizeMode == SSRM_LeadingEdge)
 	{
-		FFrameRate FrameRate = Section.GetTypedOuter<UMovieScene>()->GetTickResolution();
-		float      StartOffset = (ResizeFrameNumber - InitialStartTimeDuringResize) / FrameRate * Section.Params.PlayRate;
+		FFrameRate FrameRate     = Section.GetTypedOuter<UMovieScene>()->GetTickResolution();
+		FFrameNumber StartOffset = FrameRate.AsFrameNumber((ResizeFrameNumber - InitialStartTimeDuringResize) / FrameRate * Section.Params.PlayRate);
 
 		StartOffset += InitialStartOffsetDuringResize;
 
 		// Ensure start offset is not less than 0 and adjust ResizeTime
 		if (StartOffset < 0)
 		{
-			ResizeFrameNumber = ResizeFrameNumber - ((StartOffset * Section.Params.PlayRate) * FrameRate).RoundToFrame();
+			ResizeFrameNumber = ResizeFrameNumber - StartOffset;
 
-			StartOffset = 0.f;
+			StartOffset = FFrameNumber(0);
 		}
 
 		Section.Params.StartOffset = StartOffset;
@@ -175,15 +177,19 @@ void FFlipbookAnimationSection::BeginSlipSection()
 	BeginResizeSection();
 }
 
-void FFlipbookAnimationSection::SlipSection(double SlipTime)
+void FFlipbookAnimationSection::SlipSection(FFrameNumber SlipTime)
 {
-	float StartOffset = (SlipTime - InitialStartTimeDuringResize / Section.GetTypedOuter<UMovieScene>()->GetTickResolution()) * Section.Params.PlayRate;
+	FFrameRate FrameRate = Section.GetTypedOuter<UMovieScene>()->GetTickResolution();
+	FFrameNumber StartOffset = FrameRate.AsFrameNumber((SlipTime - InitialStartTimeDuringResize) / FrameRate * Section.Params.PlayRate);
+
 	StartOffset += InitialStartOffsetDuringResize;
 
 	// Ensure start offset is not less than 0
 	if (StartOffset < 0)
 	{
-		StartOffset = 0.f;
+		SlipTime = SlipTime - StartOffset;
+
+		StartOffset = FFrameNumber(0);
 	}
 
 	Section.Params.StartOffset = StartOffset;
@@ -422,7 +428,7 @@ TSharedPtr<SWidget> FFlipbookAnimationTrackEditor::BuildOutlinerEditWidget(const
 	.AutoWidth()
 	.VAlign(VAlign_Center)
 	[
-		FSequencerUtilities::MakeAddButton(LOCTEXT("AnimationText", "Animation"), FOnGetContent::CreateSP(this, &FFlipbookAnimationTrackEditor::BuildAnimationSubMenu, ObjectBinding, Track), Params.NodeIsHovered)
+		FSequencerUtilities::MakeAddButton(LOCTEXT("AnimationText", "Animation"), FOnGetContent::CreateSP(this, &FFlipbookAnimationTrackEditor::BuildAnimationSubMenu, ObjectBinding, Track), Params.NodeIsHovered, GetSequencer())
 	];
 }
 

@@ -34,7 +34,7 @@ public:
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
-	FStateMachineBlueprintCompiler(UStateMachineBlueprint* SourceSketch, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompilerOptions, TArray<UObject*>* InObjLoaded);
+	FStateMachineBlueprintCompiler(UStateMachineBlueprint* SourceSketch, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompilerOptions);
 	virtual ~FStateMachineBlueprintCompiler();
 
 	// FKismetCompilerContext

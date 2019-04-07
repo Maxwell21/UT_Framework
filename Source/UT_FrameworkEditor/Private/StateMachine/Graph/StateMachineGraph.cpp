@@ -46,30 +46,30 @@ void UStateMachineGraph::ReconstructNodes()
 	// Reconstruct nodes
 	for (UEdGraphNode* EdGraphNode : this->StateMachineBlueprint->Nodes)
 	{
-		if (UStateMachineGraphNode_Transition* StateMachineNode = Cast<UStateMachineGraphNode_Transition>(EdGraphNode))
+		if (UStateMachineGraphNode_Transition* TransitionStateMachineNode = Cast<UStateMachineGraphNode_Transition>(EdGraphNode))
 		{
-			if (!StateMachineNode->Transition)
+			if (!TransitionStateMachineNode->Transition)
 				continue;
 
-			StateMachineNode->Transition->Modify();
+			TransitionStateMachineNode->Transition->Modify();
 
-			StateMachineNode->ReconstructNode();
-			StateMachineNode->Transition->GraphNode = StateMachineNode;
-			this->AddNode(StateMachineNode, false, false);
+			TransitionStateMachineNode->ReconstructNode();
+			TransitionStateMachineNode->Transition->GraphNode = TransitionStateMachineNode;
+			this->AddNode(TransitionStateMachineNode, false, false);
 
 			// Apply current blueprint object edited
-			this->SetCurrentStateMachineBlueprintToNode(StateMachineNode);
+			this->SetCurrentStateMachineBlueprintToNode(TransitionStateMachineNode);
 
-			StateMachineNode->Transition->PostEditChange();
-			StateMachineNode->Transition->MarkPackageDirty();
+			TransitionStateMachineNode->Transition->PostEditChange();
+			TransitionStateMachineNode->Transition->MarkPackageDirty();
 		}
-		else if (UStateMachineGraphNode_Entry* StateMachineNode = Cast<UStateMachineGraphNode_Entry>(EdGraphNode))
+		else if (UStateMachineGraphNode_Entry* EntryStateMachineNode = Cast<UStateMachineGraphNode_Entry>(EdGraphNode))
 		{
-			StateMachineNode->ReconstructNode();
-			this->AddNode(StateMachineNode, false, false);
+			EntryStateMachineNode->ReconstructNode();
+			this->AddNode(EntryStateMachineNode, false, false);
 
 			// Apply current blueprint object edited
-			this->SetCurrentStateMachineBlueprintToNode(StateMachineNode);
+			this->SetCurrentStateMachineBlueprintToNode(EntryStateMachineNode);
 		}
 		else if (UStateMachineGraphNode* StateMachineNode = Cast<UStateMachineGraphNode>(EdGraphNode))
 		{

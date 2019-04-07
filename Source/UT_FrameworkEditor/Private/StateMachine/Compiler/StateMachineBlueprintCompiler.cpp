@@ -8,8 +8,8 @@
 #include "StateMachineBlueprint.h"
 #include "KismetReinstanceUtilities.h"
 
-FStateMachineBlueprintCompiler::FStateMachineBlueprintCompiler(UStateMachineBlueprint* SourceSketch, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompilerOptions, TArray<UObject*>* InObjLoaded)
-	: Super(SourceSketch, InMessageLog, InCompilerOptions, InObjLoaded)
+FStateMachineBlueprintCompiler::FStateMachineBlueprintCompiler(UStateMachineBlueprint* SourceSketch, FCompilerResultsLog& InMessageLog, const FKismetCompilerOptions& InCompilerOptions)
+	: Super(SourceSketch, InMessageLog, InCompilerOptions)
 {
 }
 
