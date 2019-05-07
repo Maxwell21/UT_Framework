@@ -22,7 +22,7 @@
 		{
 			"Name": "UT_FrameworkEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PreDefault"
 		}
 	],
 	"Plugins": [

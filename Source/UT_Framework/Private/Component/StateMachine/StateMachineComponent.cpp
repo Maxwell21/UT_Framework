@@ -14,13 +14,20 @@ UStateMachineComponent::UStateMachineComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
 // Called when the game starts
 void UStateMachineComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AutoStart)
+	if (StateMachine == nullptr)
+	{
+		this->StateMachine = UStateMachine::ConstructStateMachine(Template, this, UGameplayStatics::GetPlayerController(this, 0));
+
+		if (this->StateMachine)
+			this->BindDelegates();
+	}
+
+	if (StateMachine && AutoStart)
 		this->Start();
 }
 
@@ -42,17 +49,7 @@ FState UStateMachineComponent::GetCurrentState()
 
 void UStateMachineComponent::Start()
 {
-	if (StateMachine == nullptr)
-	{
-		this->StateMachine = UStateMachine::ConstructStateMachine(Template, this, UGameplayStatics::GetPlayerController(this, 0));
-
-		if (this->StateMachine)
-		{
-			this->BindDelegates();
-			this->StateMachine->Start();
-		}
-	}
-	else 
+	if (StateMachine)
 		this->StateMachine->Start();
 }
 
@@ -68,6 +65,11 @@ FString UStateMachineComponent::GetCurrentStateName()
 		return this->StateMachine->GetCurrentStateName();
 
 	return FString();
+}
+
+UStateMachine* UStateMachineComponent::GetMachine()
+{
+	return this->StateMachine;
 }
 
 void UStateMachineComponent::Pause()

@@ -91,6 +91,12 @@ public:
 	FString GetCurrentStateName();
 
 	/**
+	* @return UStateMachine*
+	*/
+	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable, BlueprintPure)
+	UStateMachine* GetMachine();
+
+	/**
 	* Paused state machine
 	*/
 	UFUNCTION(Category = "Umbra Framework | State Machine", BlueprintCallable)
