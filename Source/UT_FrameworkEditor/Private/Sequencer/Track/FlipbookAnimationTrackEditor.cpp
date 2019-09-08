@@ -272,30 +272,33 @@ bool FFlipbookAnimationTrackEditor::HandleAssetAdded(UObject* Asset, const FGuid
 	return false;
 }
 
-void FFlipbookAnimationTrackEditor::BuildObjectBindingTrackMenu(FMenuBuilder& MenuBuilder, const FGuid& ObjectBinding, const UClass* ObjectClass)
+void FFlipbookAnimationTrackEditor::BuildObjectBindingTrackMenu(FMenuBuilder& MenuBuilder, const TArray<FGuid>& ObjectBindings, const UClass* ObjectClass)
 {
 	if (ObjectClass->IsChildOf(UPaperFlipbookComponent::StaticClass()) || ObjectClass->IsChildOf(AActor::StaticClass()))
 	{
 		const TSharedPtr<ISequencer> ParentSequencer = GetSequencer();
 
-		UPaperFlipbookComponent* PaperFlipbookComponent = AcquireFlipbookComponentFromObjectGuid(ObjectBinding, GetSequencer());
-		if (PaperFlipbookComponent)
+		for (auto const& ObjectBinding : ObjectBindings)
 		{
-			// Load the asset registry module
-			FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
-
-			// Collect a full list of assets with the specified class
-			TArray<FAssetData> AssetDataList;
-			AssetRegistryModule.Get().GetAssetsByClass(UPaperFlipbook::StaticClass()->GetFName(), AssetDataList, true);
-
-			if (AssetDataList.Num())
+			UPaperFlipbookComponent* PaperFlipbookComponent = AcquireFlipbookComponentFromObjectGuid(ObjectBinding, GetSequencer());
+			if (PaperFlipbookComponent)
 			{
-				UMovieSceneTrack* Track = nullptr;
+				// Load the asset registry module
+				FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
-				MenuBuilder.AddSubMenu(
-					LOCTEXT("AddAnimation", "Animation"), NSLOCTEXT("Sequencer", "AddAnimationTooltip", "Adds an animation track."),
-					FNewMenuDelegate::CreateRaw(this, &FFlipbookAnimationTrackEditor::AddAnimationSubMenu, ObjectBinding, Track)
-				);
+				// Collect a full list of assets with the specified class
+				TArray<FAssetData> AssetDataList;
+				AssetRegistryModule.Get().GetAssetsByClass(UPaperFlipbook::StaticClass()->GetFName(), AssetDataList, true);
+
+				if (AssetDataList.Num())
+				{
+					UMovieSceneTrack* Track = nullptr;
+
+					MenuBuilder.AddSubMenu(
+						LOCTEXT("AddAnimation", "Animation"), NSLOCTEXT("Sequencer", "AddAnimationTooltip", "Adds an animation track."),
+						FNewMenuDelegate::CreateRaw(this, &FFlipbookAnimationTrackEditor::AddAnimationSubMenu, ObjectBinding, Track)
+					);
+				}
 			}
 		}
 	}

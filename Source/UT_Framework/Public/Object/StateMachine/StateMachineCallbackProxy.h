@@ -34,16 +34,14 @@ class UStateMachineCallbackProxy : public UObject
 	UPROPERTY(BlueprintAssignable)
 	FOnConstructStateMachineDelegate OnFailed;
 
-	UPROPERTY(BlueprintReadOnly)
-	UStateMachine* StateMachine;
-
 	/************************************************************************/
 	/* FUNCTIONS                                                            */
 	/************************************************************************/
 
 	// Called to perform the query internally
-	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"))
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"))
 	static UStateMachineCallbackProxy* CreateProxyObjectForConstructStateMachine(
+		UObject* WorldContextObject,
 		TSubclassOf<UStateMachine> Template,
 		UObject* Owner,
 		APlayerController* Controller);

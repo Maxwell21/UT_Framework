@@ -12,9 +12,9 @@ UStateMachineCallbackProxy::UStateMachineCallbackProxy(const FObjectInitializer&
 {
 }
 
-UStateMachineCallbackProxy* UStateMachineCallbackProxy::CreateProxyObjectForConstructStateMachine(TSubclassOf<UStateMachine> Template, UObject* Owner, APlayerController* Controller)
+UStateMachineCallbackProxy* UStateMachineCallbackProxy::CreateProxyObjectForConstructStateMachine(UObject* WorldContextObject, TSubclassOf<UStateMachine> Template, UObject* Owner, APlayerController* Controller)
 {
-	UStateMachineCallbackProxy* Proxy = NewObject<UStateMachineCallbackProxy>();
+	UStateMachineCallbackProxy* Proxy = NewObject<UStateMachineCallbackProxy>(WorldContextObject);
 	Proxy->SetFlags(RF_StrongRefOnFrame);
 
 	if (UStateMachine* StateMachine = UStateMachine::ConstructStateMachine(Template, Owner, Controller))
