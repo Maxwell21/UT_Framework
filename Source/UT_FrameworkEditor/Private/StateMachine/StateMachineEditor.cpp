@@ -198,7 +198,6 @@ FGraphPanelSelectionSet FStateMachineEditor::GetSelectedNodes() const
 	{
 		CurrentSelection = GraphEditor->GetSelectedNodes();
 	}
-
 	return CurrentSelection;
 }
 
@@ -225,6 +224,8 @@ void FStateMachineEditor::DeleteSelectedNodes()
 			}
 		}
 	}
+
+	FBlueprintEditor::DeleteSelectedNodes();
 }
 
 bool FStateMachineEditor::CanDeleteNodes() const
