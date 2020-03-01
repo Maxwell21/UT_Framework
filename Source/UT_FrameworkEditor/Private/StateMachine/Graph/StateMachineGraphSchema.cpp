@@ -17,6 +17,9 @@
 #include "GenericCommands.h"
 #include "EdGraph/EdGraph.h"
 #include "EdGraph/EdGraphPin.h"
+#include "ToolMenus/Public/ToolMenus.h"
+#include "ToolMenus/Public/ToolMenu.h"
+#include "ToolMenus/Public/ToolMenuSection.h"
 
 #define LOCTEXT_NAMESPACE "StateMachineGraphSchema"
 
@@ -49,10 +52,12 @@ bool UStateMachineGraphSchema::ConnectionCausesLoop(const UEdGraphPin* InputPin,
 	return InputNode == OutputNode;
 }
 
-void UStateMachineGraphSchema::GetBreakLinkToSubMenuActions(class FMenuBuilder& MenuBuilder, class UEdGraphPin* InGraphPin)
+void UStateMachineGraphSchema::GetBreakLinkToSubMenuActions(class UToolMenu* Menu, class UEdGraphPin* InGraphPin)
 {
 	// Make sure we have a unique name for every entry in the list
 	TMap< FString, uint32 > LinkTitleCount;
+
+	FToolMenuSection& Section = Menu->FindOrAddSection("AIGraphSchemaPinActions");
 
 	// Add all the links we could break from
 	for (TArray<class UEdGraphPin*>::TConstIterator Links(InGraphPin->LinkedTo); Links; ++Links)
@@ -88,7 +93,7 @@ void UStateMachineGraphSchema::GetBreakLinkToSubMenuActions(class FMenuBuilder& 
 		}
 		++Count;
 
-		MenuBuilder.AddMenuEntry(Description, Description, FSlateIcon(), FUIAction(
+		Section.AddMenuEntry(NAME_None, Description, Description, FSlateIcon(), FUIAction(
 			FExecuteAction::CreateUObject((UStateMachineGraphSchema*const)this, &UStateMachineGraphSchema::BreakSinglePinLink, const_cast<UEdGraphPin*>(InGraphPin), *Links)));
 	}
 }
@@ -105,50 +110,86 @@ void UStateMachineGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& 
 	ContextMenuBuilder.AddAction(NewStateAction);
 }
 
-void UStateMachineGraphSchema::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
+// void UStateMachineGraphSchema::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
+// {
+// 	if (InGraphPin)
+// 	{
+// 		MenuBuilder->BeginSection("StateMachineGraphSchemaPinActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
+// 		{
+// 			// Only display the 'Break Links' option if there is a link to break!
+// 			if (InGraphPin->LinkedTo.Num() > 0)
+// 			{
+// 				MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
+// 
+// 				// add sub menu for break link to
+// 				if (InGraphPin->LinkedTo.Num() > 1)
+// 				{
+// 					MenuBuilder->AddSubMenu(
+// 						LOCTEXT("BreakLinkTo", "Break Link To..."),
+// 						LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
+// 						FNewMenuDelegate::CreateUObject((UStateMachineGraphSchema*const)this, &UStateMachineGraphSchema::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
+// 					MenuBuilder->AddSubMenu(
+// 						LOCTEXT("StraightenConnection", "Straighten Connection To..."),
+// 						LOCTEXT("StraightenConnection_Tip", "Straighten a specific connection"),
+// 						FNewMenuDelegate::CreateUObject(this, &UEdGraphSchema_K2::GetStraightenConnectionToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
+// 				}
+// 				else
+// 				{
+// 					((UStateMachineGraphSchema*const)this)->GetBreakLinkToSubMenuActions(*MenuBuilder, const_cast<UEdGraphPin*>(InGraphPin));
+// 
+// 					UEdGraphPin* Pin = InGraphPin->LinkedTo[0];
+// 					FText PinName = Pin->GetDisplayName();
+// 					FText NodeName = Pin->GetOwningNode()->GetNodeTitle(ENodeTitleType::ListView);
+// 
+// 					MenuBuilder->AddMenuEntry(
+// 						FGraphEditorCommands::Get().StraightenConnections,
+// 						NAME_None,
+// 						FText::Format(LOCTEXT("StraightenDescription_SinglePin", "Straighten Connection to {0}"), NodeName),
+// 						FText::Format(LOCTEXT("StraightenDescription_SinglePin_Node_Tip", "Straighten the connection between this pin, and {0}"), NodeName),
+// 						FSlateIcon(NAME_None, NAME_None, NAME_None)
+// 					);
+// 				}
+// 			}
+// 		}
+// 
+// 		MenuBuilder->EndSection();
+// 	}
+// }
+
+void UStateMachineGraphSchema::GetContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const
 {
-	if (InGraphPin)
+	if (Context->Pin)
 	{
-		MenuBuilder->BeginSection("StateMachineGraphSchemaPinActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
+		FToolMenuSection& Section = Menu->AddSection("StateMachineGraphSchemaPinActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
+		// Only display the 'Break Links' option if there is a link to break!
+		if (Context->Pin->LinkedTo.Num() > 0)
 		{
-			// Only display the 'Break Links' option if there is a link to break!
-			if (InGraphPin->LinkedTo.Num() > 0)
+			Section.AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
+			Section.AddMenuEntry(FGraphEditorCommands::Get().StraightenConnections);
+
+			// add sub menu for break link to
+			if (Context->Pin->LinkedTo.Num() > 1)
 			{
-				MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
+				Section.AddSubMenu(
+					"BreakLinkTo",
+					LOCTEXT("BreakLinkTo", "Break Link To..."),
+					LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
+					FNewToolMenuDelegate::CreateUObject((UStateMachineGraphSchema* const)this, &UStateMachineGraphSchema::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(Context->Pin)));
+				Section.AddSubMenu(
+					"StraightenConnection",
+					LOCTEXT("StraightenConnection", "Straighten Connection To..."),
+					LOCTEXT("StraightenConnection_Tip", "Straighten a specific connection"),
+					FNewToolMenuDelegate::CreateUObject(this, &UEdGraphSchema_K2::GetStraightenConnectionToSubMenuActions, const_cast<UEdGraphPin*>(Context->Pin)));
+			}
+			else
+			{
+				((UStateMachineGraphSchema* const)this)->GetBreakLinkToSubMenuActions(Menu, const_cast<UEdGraphPin*>(Context->Pin));
 
-				// add sub menu for break link to
-				if (InGraphPin->LinkedTo.Num() > 1)
-				{
-					MenuBuilder->AddSubMenu(
-						LOCTEXT("BreakLinkTo", "Break Link To..."),
-						LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
-						FNewMenuDelegate::CreateUObject((UStateMachineGraphSchema*const)this, &UStateMachineGraphSchema::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
-					MenuBuilder->AddSubMenu(
-						LOCTEXT("StraightenConnection", "Straighten Connection To..."),
-						LOCTEXT("StraightenConnection_Tip", "Straighten a specific connection"),
-						FNewMenuDelegate::CreateUObject(this, &UEdGraphSchema_K2::GetStraightenConnectionToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
-				}
-				else
-				{
-					((UStateMachineGraphSchema*const)this)->GetBreakLinkToSubMenuActions(*MenuBuilder, const_cast<UEdGraphPin*>(InGraphPin));
-
-					UEdGraphPin* Pin = InGraphPin->LinkedTo[0];
-					FText PinName = Pin->GetDisplayName();
-					FText NodeName = Pin->GetOwningNode()->GetNodeTitle(ENodeTitleType::ListView);
-
-					MenuBuilder->AddMenuEntry(
-						FGraphEditorCommands::Get().StraightenConnections,
-						NAME_None,
-						FText::Format(LOCTEXT("StraightenDescription_SinglePin", "Straighten Connection to {0}"), NodeName),
-						FText::Format(LOCTEXT("StraightenDescription_SinglePin_Node_Tip", "Straighten the connection between this pin, and {0}"), NodeName),
-						FSlateIcon(NAME_None, NAME_None, NAME_None)
-					);
-				}
 			}
 		}
-
-		MenuBuilder->EndSection();
 	}
+
+	Super::GetContextMenuActions(Menu, Context);
 }
 
 const FPinConnectionResponse UStateMachineGraphSchema::CanCreateConnection(const UEdGraphPin* PinA, const UEdGraphPin* PinB) const

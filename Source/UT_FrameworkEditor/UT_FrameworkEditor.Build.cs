@@ -29,6 +29,7 @@ public class UT_FrameworkEditor : ModuleRules
                 "KismetWidgets",
                 "UnrealEd",
                 "Kismet",
+                "ToolMenus",
                 "GraphEditor",
                 "BlueprintGraph",
                 "AIModule",
