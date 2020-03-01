@@ -110,52 +110,6 @@ void UStateMachineGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& 
 	ContextMenuBuilder.AddAction(NewStateAction);
 }
 
-// void UStateMachineGraphSchema::GetContextMenuActions(const UEdGraph* CurrentGraph, const UEdGraphNode* InGraphNode, const UEdGraphPin* InGraphPin, class FMenuBuilder* MenuBuilder, bool bIsDebugging) const
-// {
-// 	if (InGraphPin)
-// 	{
-// 		MenuBuilder->BeginSection("StateMachineGraphSchemaPinActions", LOCTEXT("PinActionsMenuHeader", "Pin Actions"));
-// 		{
-// 			// Only display the 'Break Links' option if there is a link to break!
-// 			if (InGraphPin->LinkedTo.Num() > 0)
-// 			{
-// 				MenuBuilder->AddMenuEntry(FGraphEditorCommands::Get().BreakPinLinks);
-// 
-// 				// add sub menu for break link to
-// 				if (InGraphPin->LinkedTo.Num() > 1)
-// 				{
-// 					MenuBuilder->AddSubMenu(
-// 						LOCTEXT("BreakLinkTo", "Break Link To..."),
-// 						LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
-// 						FNewMenuDelegate::CreateUObject((UStateMachineGraphSchema*const)this, &UStateMachineGraphSchema::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
-// 					MenuBuilder->AddSubMenu(
-// 						LOCTEXT("StraightenConnection", "Straighten Connection To..."),
-// 						LOCTEXT("StraightenConnection_Tip", "Straighten a specific connection"),
-// 						FNewMenuDelegate::CreateUObject(this, &UEdGraphSchema_K2::GetStraightenConnectionToSubMenuActions, const_cast<UEdGraphPin*>(InGraphPin)));
-// 				}
-// 				else
-// 				{
-// 					((UStateMachineGraphSchema*const)this)->GetBreakLinkToSubMenuActions(*MenuBuilder, const_cast<UEdGraphPin*>(InGraphPin));
-// 
-// 					UEdGraphPin* Pin = InGraphPin->LinkedTo[0];
-// 					FText PinName = Pin->GetDisplayName();
-// 					FText NodeName = Pin->GetOwningNode()->GetNodeTitle(ENodeTitleType::ListView);
-// 
-// 					MenuBuilder->AddMenuEntry(
-// 						FGraphEditorCommands::Get().StraightenConnections,
-// 						NAME_None,
-// 						FText::Format(LOCTEXT("StraightenDescription_SinglePin", "Straighten Connection to {0}"), NodeName),
-// 						FText::Format(LOCTEXT("StraightenDescription_SinglePin_Node_Tip", "Straighten the connection between this pin, and {0}"), NodeName),
-// 						FSlateIcon(NAME_None, NAME_None, NAME_None)
-// 					);
-// 				}
-// 			}
-// 		}
-// 
-// 		MenuBuilder->EndSection();
-// 	}
-// }
-
 void UStateMachineGraphSchema::GetContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const
 {
 	if (Context->Pin)
