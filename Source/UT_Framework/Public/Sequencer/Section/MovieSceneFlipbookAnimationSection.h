@@ -56,8 +56,7 @@ struct FMovieSceneFlipbookAnimationParams
  * Movie scene section that control flipbook animation
  */
 UCLASS( MinimalAPI )
-class UMovieSceneFlipbookAnimationSection
-	: public UMovieSceneSection
+class UMovieSceneFlipbookAnimationSection : public UMovieSceneSection
 {
 	GENERATED_UCLASS_BODY()
 
@@ -78,7 +77,7 @@ public:
 	UT_FRAMEWORK_API float MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const;
 
 	//~ MovieSceneSection interface
-	virtual UMovieSceneSection* SplitSection(FQualifiedFrameTime SplitTime) override;
+	virtual UMovieSceneSection* SplitSection(FQualifiedFrameTime SplitTime, bool bDeleteKeys) override;
 	virtual void GetSnapTimes(TArray<FFrameNumber>& OutSnapTimes, bool bGetSectionBorders) const override;
 	virtual FMovieSceneEvalTemplatePtr GenerateTemplate() const override;
 

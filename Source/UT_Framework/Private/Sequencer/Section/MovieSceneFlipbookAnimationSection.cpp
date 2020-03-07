@@ -102,14 +102,14 @@ float UMovieSceneFlipbookAnimationSection::MapTimeToAnimation(FFrameTime InPosit
 	return TemplateParams.MapTimeToAnimation(InPosition, InFrameRate);
 }
 
-UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualifiedFrameTime SplitTime)
+UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualifiedFrameTime SplitTime, bool bDeleteKeys)
 {
 	FFrameRate FrameRate = GetTypedOuter<UMovieScene>()->GetTickResolution();
 
 	FFrameNumber NewOffset = HasStartFrame() ? GetStartOffsetAtTrimTime(SplitTime, Params, GetInclusiveStartFrame(), FrameRate) : 0;
 	NewOffset += Params.StartOffset;
 
-	UMovieSceneSection* NewSection = Super::SplitSection(SplitTime);
+	UMovieSceneSection* NewSection = Super::SplitSection(SplitTime, bDeleteKeys);
 	if (NewSection != nullptr)
 	{
 		UMovieSceneFlipbookAnimationSection* NewFlipbookSection = Cast<UMovieSceneFlipbookAnimationSection>(NewSection);
