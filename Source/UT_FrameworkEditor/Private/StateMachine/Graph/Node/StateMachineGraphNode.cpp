@@ -117,7 +117,7 @@ void UStateMachineGraphNode::OnNotifyGraphChanged()
 	this->SaveNode();
 }
 
-void UStateMachineGraphNode::OnPropertyUpdated(const FPropertyChangedEvent& PropertyChangedEvent, UProperty* PropertyThatChanged)
+void UStateMachineGraphNode::OnPropertyUpdated(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
 {
 
 }

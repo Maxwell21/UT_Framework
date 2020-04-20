@@ -125,7 +125,7 @@ void UMovieSceneFlipbookAnimationSection::GetSnapTimes(TArray<FFrameNumber>& Out
 
 #if WITH_EDITOR
 
-void UMovieSceneFlipbookAnimationSection::PreEditChange(UProperty* PropertyAboutToChange)
+void UMovieSceneFlipbookAnimationSection::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	// Store the current play rate so that we can compute the amount to compensate the section end time when the play rate changes
 	PreviousPlayRate = Params.PlayRate;

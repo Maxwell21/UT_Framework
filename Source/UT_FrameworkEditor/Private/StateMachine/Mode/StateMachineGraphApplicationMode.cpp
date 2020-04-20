@@ -8,6 +8,7 @@
 #include "BlueprintEditorTabs.h"
 #include "SBlueprintEditorToolbar.h"
 #include "EditorStyleSet.h"
+#include "ToolMenu.h"
 
 #define LOCTEXT_NAMESPACE "StateMachineEditor"
 
@@ -80,10 +81,14 @@ FStateMachineGraphApplicationMode::FStateMachineGraphApplicationMode(TSharedPtr<
 
 	ToolbarExtender = MakeShareable(new FExtender);
 	InStateMachineEditor->GetWidgetToolbarBuilder()->AddWidgetBlueprintEditorModesToolbar(ToolbarExtender);
-	InStateMachineEditor->GetToolbarBuilder()->AddCompileToolbar(ToolbarExtender);
-	InStateMachineEditor->GetToolbarBuilder()->AddScriptingToolbar(ToolbarExtender);
-	InStateMachineEditor->GetToolbarBuilder()->AddBlueprintGlobalOptionsToolbar(ToolbarExtender);
-	InStateMachineEditor->GetToolbarBuilder()->AddDebuggingToolbar(ToolbarExtender);
+
+	if (UToolMenu* Toolbar = InStateMachineEditor->RegisterModeToolbarIfUnregistered(GetModeName()))
+	{
+		InStateMachineEditor->GetToolbarBuilder()->AddCompileToolbar(Toolbar);
+		InStateMachineEditor->GetToolbarBuilder()->AddScriptingToolbar(Toolbar);
+		InStateMachineEditor->GetToolbarBuilder()->AddBlueprintGlobalOptionsToolbar(Toolbar);
+		InStateMachineEditor->GetToolbarBuilder()->AddDebuggingToolbar(Toolbar);
+	}
 }
 
 FText FStateMachineGraphApplicationMode::GetLocalizedMode(const FName InMode)
