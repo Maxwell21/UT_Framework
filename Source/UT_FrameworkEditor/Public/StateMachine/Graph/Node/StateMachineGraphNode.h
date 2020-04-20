@@ -53,7 +53,7 @@ public:
 	virtual void DestroyNode() override;
 	virtual void SaveNode();
 	virtual void OnNotifyGraphChanged(); 
-	virtual void OnPropertyUpdated(const FPropertyChangedEvent& PropertyChangedEvent, UProperty* PropertyThatChanged);
+	virtual void OnPropertyUpdated(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged);
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	// End of UEdGraphNode interface.

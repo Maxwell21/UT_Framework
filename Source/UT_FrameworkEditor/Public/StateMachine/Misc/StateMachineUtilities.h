@@ -151,11 +151,11 @@ public:
 		State.FinishFunctionName = State.Name + SUFFIX_FINISH_NAME;
 
 		// Generate new events
-		UFunction* BeginFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "BeginState");
+		UFunction* BeginFunction = FindUField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "BeginState");
 		UK2Node_CustomEvent* BeginEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 0), SmState->StateGraph, State.BeginFunctionName, BeginFunction, false);
 		BeginEvent->bCanRenameNode = false;
 
-		UFunction* UpdateFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "UpdateState");
+		UFunction* UpdateFunction = FindUField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "UpdateState");
 		UK2Node_CustomEvent* UpdateEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 100.f), SmState->StateGraph, State.UpdateFunctionName, UpdateFunction, false);
 	
 		TSharedPtr<FUserPinInfo> PinDefinition = MakeShareable(new FUserPinInfo);
@@ -169,7 +169,7 @@ public:
 		UpdateEvent->ReconstructNode();
 		UpdateEvent->bCanRenameNode = false;
 
-		UFunction* FinishFunction = FindField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "FinishState");
+		UFunction* FinishFunction = FindUField<UFunction>(Blueprint->GetStateMachine()->GetClass(), "FinishState");
 		UK2Node_CustomEvent* FinishEvent = UK2Node_CustomEvent::CreateFromFunction(FVector2D(0, 250.f), SmState->StateGraph, State.FinishFunctionName, FinishFunction, false);
 		FinishEvent->bCanRenameNode = false;
 

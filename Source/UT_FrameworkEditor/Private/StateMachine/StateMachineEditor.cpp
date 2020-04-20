@@ -278,7 +278,7 @@ UStateMachineGraph* FStateMachineEditor::GetStateMachineGraph()
 	return Cast<UStateMachineGraph>(this->StateMachineBlueprint->StateMachineGraph);
 }
 
-void FStateMachineEditor::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, UProperty* PropertyThatChanged)
+void FStateMachineEditor::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
 {
 	if (GraphEditor.IsValid() && PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive)
 	{
