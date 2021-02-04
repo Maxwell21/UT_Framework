@@ -107,13 +107,6 @@ void UMovieSceneFlipbookAnimationSection::PostLoad()
 	Super::PostLoad();
 }
 
-/*
-FMovieSceneEvalTemplatePtr UMovieSceneFlipbookAnimationSection::GenerateTemplate() const
-{
-	return FMovieSceneFlipbookAnimationSectionTemplate(*this);
-}
-*/
-
 float UMovieSceneFlipbookAnimationSection::MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const
 {
 	FMovieSceneFlipbookAnimationSectionTemplateParameters TemplateParams(Params, GetInclusiveStartFrame(), GetExclusiveEndFrame());
