@@ -5,6 +5,7 @@
 
 #include "MovieSceneFlipbookAnimationTrack.h"
 #include "MovieSceneEvaluationCustomVersion.h"
+#include "MovieSceneEvaluationTreePopulationRules.h"
 #include "MovieSceneFlipbookAnimationSection.h"
 #include "Compilation/MovieSceneCompilerRules.h"
 #include "Evaluation/MovieSceneEvaluationTrack.h"
@@ -82,9 +83,47 @@ bool UMovieSceneFlipbookAnimationTrack::SupportsMultipleRows() const
 	return true;
 }
 
+FMovieSceneEvalTemplatePtr UMovieSceneFlipbookAnimationTrack::CreateTemplateForSection(const UMovieSceneSection& InSection) const
+{
+	return FMovieSceneFlipbookAnimationSectionTemplate(*CastChecked<const UMovieSceneFlipbookAnimationSection>(&InSection));
+}
+
+void UMovieSceneFlipbookAnimationTrack::SortSections()
+{
+	AnimationSections.Sort([](UMovieSceneSection& A,  UMovieSceneSection& B) {return ((A).GetTrueRange().GetLowerBoundValue() < (B).GetTrueRange().GetLowerBoundValue());});
+}
+
 UMovieSceneSection* UMovieSceneFlipbookAnimationTrack::CreateNewSection()
 {
 	return NewObject<UMovieSceneFlipbookAnimationSection>(this);
+}
+
+bool UMovieSceneFlipbookAnimationTrack::PopulateEvaluationTree(TMovieSceneEvaluationTree<FMovieSceneTrackEvaluationData>& OutData) const
+{
+	using namespace UE::MovieScene;
+
+	if (!bUseLegacySectionIndexBlend)
+	{
+		FEvaluationTreePopulationRules::HighPassPerRow(AnimationSections, OutData);
+	}
+	else
+	{
+		// Use legacy blending... when there's overlapping, the section that makes it into the evaluation tree is
+		// the one that appears later in the container arary of section data.
+		//
+		auto SortByLatestInArrayAndRow = [](const FEvaluationTreePopulationRules::FSortedSection& A, const FEvaluationTreePopulationRules::FSortedSection& B)
+		{
+			if (A.Row() == B.Row())
+			{
+				return A.Index > B.Index;
+			}
+			
+			return A.Row() < B.Row();
+		};
+
+		UE::MovieScene::FEvaluationTreePopulationRules::HighPassCustomPerRow(AnimationSections, OutData, SortByLatestInArrayAndRow);
+	}
+	return true;
 }
 
 void UMovieSceneFlipbookAnimationTrack::RemoveAllAnimationData()
@@ -112,11 +151,22 @@ bool UMovieSceneFlipbookAnimationTrack::IsEmpty() const
 	return AnimationSections.Num() == 0;
 }
 
+bool UMovieSceneFlipbookAnimationTrack::SupportsType(TSubclassOf<UMovieSceneSection> SectionClass) const
+{
+	return SectionClass == UMovieSceneFlipbookAnimationSection::StaticClass();
+}
+
 #if WITH_EDITORONLY_DATA
 
 FText UMovieSceneFlipbookAnimationTrack::GetDefaultDisplayName() const
 {
 	return LOCTEXT("TrackName", "Animation");
+}
+
+void UMovieSceneFlipbookAnimationTrack::OnSectionMoved(UMovieSceneSection& Section,
+	const FMovieSceneSectionMovedParams& Params)
+{
+	SortSections();
 }
 
 #endif

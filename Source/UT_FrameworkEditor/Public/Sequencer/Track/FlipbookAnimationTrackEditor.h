@@ -40,6 +40,11 @@ public:
 	virtual ~FFlipbookAnimationTrackEditor() { }
 
 	/**
+	* Keeps track of how many skeletal animation track editors we have*
+	*/
+	static int32 NumberActive;
+
+	/**
 	 * Creates an instance of this class.  Called by a sequencer 
 	 *
 	 * @param OwningSequencer The sequencer instance to be used by this tool
@@ -47,16 +52,16 @@ public:
 	 */
 	static TSharedRef<ISequencerTrackEditor> CreateTrackEditor( TSharedRef<ISequencer> OwningSequencer );
 
-public:
-
 	// ISequencerTrackEditor interface
-	virtual void AddKey(const FGuid& ObjectGuid) override;
+	//virtual void AddKey(const FGuid& ObjectGuid) override;
 	virtual void BuildObjectBindingTrackMenu(FMenuBuilder& MenuBuilder, const TArray<FGuid>& ObjectBindings, const UClass* ObjectClass) override;
 	virtual bool HandleAssetAdded(UObject* Asset, const FGuid& TargetObjectGuid) override;
 	virtual TSharedRef<ISequencerSection> MakeSectionInterface( UMovieSceneSection& SectionObject, UMovieSceneTrack& Track, FGuid ObjectBinding ) override;
 	virtual bool SupportsType( TSubclassOf<UMovieSceneTrack> Type ) const override;
 	virtual void BuildTrackContextMenu( FMenuBuilder& MenuBuilder, UMovieSceneTrack* Track ) override;
 	virtual TSharedPtr<SWidget> BuildOutlinerEditWidget(const FGuid& ObjectBinding, UMovieSceneTrack* Track, const FBuildEditWidgetParams& Params) override;
+	virtual void OnInitialize() override;
+	virtual void OnRelease() override;
 
 private:
 

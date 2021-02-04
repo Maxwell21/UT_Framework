@@ -34,6 +34,8 @@
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
 
+int32 FFlipbookAnimationTrackEditor::NumberActive = 0;
+
 namespace FlipbookAnimationEditorConstants
 {
 	// @todo Sequencer Allow this to be customizable
@@ -217,7 +219,7 @@ TSharedRef<ISequencerSection> FFlipbookAnimationTrackEditor::MakeSectionInterfac
 	
 	return MakeShareable(new FFlipbookAnimationSection(SectionObject, GetSequencer()));
 }
-
+/*
 void FFlipbookAnimationTrackEditor::AddKey(const FGuid& ObjectGuid)
 {
 	// Load the asset registry module
@@ -242,7 +244,7 @@ void FFlipbookAnimationTrackEditor::AddKey(const FGuid& ObjectGuid)
 		}
 	}
 }
-
+*/
 bool FFlipbookAnimationTrackEditor::HandleAssetAdded(UObject* Asset, const FGuid& TargetObjectGuid)
 {
 	TSharedPtr<ISequencer> SequencerPtr = GetSequencer();
@@ -433,6 +435,16 @@ TSharedPtr<SWidget> FFlipbookAnimationTrackEditor::BuildOutlinerEditWidget(const
 	[
 		FSequencerUtilities::MakeAddButton(LOCTEXT("AnimationText", "Animation"), FOnGetContent::CreateSP(this, &FFlipbookAnimationTrackEditor::BuildAnimationSubMenu, ObjectBinding, Track), Params.NodeIsHovered, GetSequencer())
 	];
+}
+
+void FFlipbookAnimationTrackEditor::OnInitialize()
+{
+	++FFlipbookAnimationTrackEditor::NumberActive;
+}
+
+void FFlipbookAnimationTrackEditor::OnRelease()
+{
+	--FFlipbookAnimationTrackEditor::NumberActive;
 }
 
 

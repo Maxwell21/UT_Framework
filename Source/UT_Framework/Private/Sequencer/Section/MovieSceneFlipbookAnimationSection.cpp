@@ -16,6 +16,22 @@ namespace
 	FName DefaultSlotName( "DefaultSlot" );
 }
 
+FFrameNumber GetFirstLoopStartOffsetAtTrimTime(FQualifiedFrameTime TrimTime, const FMovieSceneFlipbookAnimationParams& Params, FFrameNumber StartFrame, FFrameRate FrameRate)
+{
+	const float AnimPlayRate = FMath::IsNearlyZero(Params.PlayRate) ? 1.0f : Params.PlayRate;
+	const float AnimPosition = (TrimTime.Time - StartFrame) / TrimTime.Rate * AnimPlayRate;
+	const float SeqLength = Params.GetSequenceLength() - FrameRate.AsSeconds(Params.StartOffset + Params.EndOffset) / AnimPlayRate;
+
+	FFrameNumber NewOffset = FrameRate.AsFrameNumber(FMath::Fmod(AnimPosition, SeqLength));
+	NewOffset += Params.FirstLoopStartFrameOffset;
+
+	const FFrameNumber SeqLengthInFrames = FrameRate.AsFrameNumber(SeqLength);
+	while (NewOffset >= SeqLengthInFrames)
+		NewOffset -= SeqLengthInFrames;
+
+	return NewOffset;
+}
+
 FMovieSceneFlipbookAnimationParams::FMovieSceneFlipbookAnimationParams()
 {
 	Animation = nullptr;
@@ -91,15 +107,27 @@ void UMovieSceneFlipbookAnimationSection::PostLoad()
 	Super::PostLoad();
 }
 
+/*
 FMovieSceneEvalTemplatePtr UMovieSceneFlipbookAnimationSection::GenerateTemplate() const
 {
 	return FMovieSceneFlipbookAnimationSectionTemplate(*this);
 }
+*/
 
 float UMovieSceneFlipbookAnimationSection::MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const
 {
 	FMovieSceneFlipbookAnimationSectionTemplateParameters TemplateParams(Params, GetInclusiveStartFrame(), GetExclusiveEndFrame());
 	return TemplateParams.MapTimeToAnimation(InPosition, InFrameRate);
+}
+
+TOptional<TRange<FFrameNumber>> UMovieSceneFlipbookAnimationSection::GetAutoSizeRange() const
+{
+	FFrameRate FrameRate = GetTypedOuter<UMovieScene>()->GetTickResolution();
+
+	FFrameTime AnimationLength = Params.GetSequenceLength() * FrameRate;
+	int32 IFrameNumber = AnimationLength.FrameNumber.Value + (int)(AnimationLength.GetSubFrame() + 0.5f);
+
+	return TRange<FFrameNumber>(GetInclusiveStartFrame(), GetInclusiveStartFrame() + IFrameNumber + 1);
 }
 
 UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualifiedFrameTime SplitTime, bool bDeleteKeys)
@@ -118,9 +146,31 @@ UMovieSceneSection* UMovieSceneFlipbookAnimationSection::SplitSection(FQualified
 	return NewSection;
 }
 
+void UMovieSceneFlipbookAnimationSection::TrimSection(FQualifiedFrameTime TrimTime, bool bTrimLeft, bool bDeleteKeys)
+{
+	SetFlags(RF_Transactional);
+
+	if (TryModify())
+	{
+		if (bTrimLeft)
+		{
+			FFrameRate FrameRate = GetTypedOuter<UMovieScene>()->GetTickResolution();
+
+			Params.FirstLoopStartFrameOffset = HasStartFrame() ? GetFirstLoopStartOffsetAtTrimTime(TrimTime, Params, GetInclusiveStartFrame(), FrameRate) : 0;
+		}
+
+		Super::TrimSection(TrimTime, bTrimLeft, bDeleteKeys);
+	}
+}
+
 void UMovieSceneFlipbookAnimationSection::GetSnapTimes(TArray<FFrameNumber>& OutSnapTimes, bool bGetSectionBorders) const
 {
 	Super::GetSnapTimes(OutSnapTimes, bGetSectionBorders);
+}
+
+TOptional<FFrameTime> UMovieSceneFlipbookAnimationSection::GetOffsetTime() const
+{
+	return TOptional<FFrameTime>(Params.FirstLoopStartFrameOffset);
 }
 
 #if WITH_EDITOR
@@ -137,6 +187,7 @@ void UMovieSceneFlipbookAnimationSection::PostEditChangeProperty(FPropertyChange
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+
 #endif
 
 #undef LOCTEXT_NAMESPACE 

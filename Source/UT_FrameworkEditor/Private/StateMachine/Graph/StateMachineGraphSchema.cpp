@@ -129,11 +129,6 @@ void UStateMachineGraphSchema::GetContextMenuActions(class UToolMenu* Menu, clas
 					LOCTEXT("BreakLinkTo", "Break Link To..."),
 					LOCTEXT("BreakSpecificLinks", "Break a specific link..."),
 					FNewToolMenuDelegate::CreateUObject((UStateMachineGraphSchema* const)this, &UStateMachineGraphSchema::GetBreakLinkToSubMenuActions, const_cast<UEdGraphPin*>(Context->Pin)));
-				Section.AddSubMenu(
-					"StraightenConnection",
-					LOCTEXT("StraightenConnection", "Straighten Connection To..."),
-					LOCTEXT("StraightenConnection_Tip", "Straighten a specific connection"),
-					FNewToolMenuDelegate::CreateUObject(this, &UEdGraphSchema_K2::GetStraightenConnectionToSubMenuActions, const_cast<UEdGraphPin*>(Context->Pin)));
 			}
 			else
 			{

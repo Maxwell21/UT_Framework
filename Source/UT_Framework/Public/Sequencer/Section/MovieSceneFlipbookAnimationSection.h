@@ -22,6 +22,10 @@ struct FMovieSceneFlipbookAnimationParams
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UPaperFlipbook* Animation;
 
+	/** The offset into the beginning of the animation clip for the first loop of play. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Animation")
+	FFrameNumber FirstLoopStartFrameOffset;
+	
 	/** The offset into the beginning of the animation clip */
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	FFrameNumber StartOffset;
@@ -77,9 +81,13 @@ public:
 	UT_FRAMEWORK_API float MapTimeToAnimation(FFrameTime InPosition, FFrameRate InFrameRate) const;
 
 	//~ MovieSceneSection interface
+	virtual TOptional<TRange<FFrameNumber> > GetAutoSizeRange() const override;
 	virtual UMovieSceneSection* SplitSection(FQualifiedFrameTime SplitTime, bool bDeleteKeys) override;
+	virtual void TrimSection(FQualifiedFrameTime TrimTime, bool bTrimLeft, bool bDeleteKeys) override;
 	virtual void GetSnapTimes(TArray<FFrameNumber>& OutSnapTimes, bool bGetSectionBorders) const override;
-	virtual FMovieSceneEvalTemplatePtr GenerateTemplate() const override;
+	virtual TOptional<FFrameTime> GetOffsetTime() const override;
+
+	//virtual FMovieSceneEvalTemplatePtr GenerateTemplate() const override;
 
 	/** ~UObject interface */
 	virtual void PostLoad() override;
@@ -92,6 +100,8 @@ private:
 	//~ UObject interface
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+public:
 	float PreviousPlayRate;
 
 #endif
